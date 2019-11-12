@@ -1,20 +1,23 @@
 #!/usr/bin/env python
+
 import random
 import re
 import string
 import unicodedata
 import warnings
-from builtins import Exception, dict, input, ord
 from collections import defaultdict
+from pathlib import Path
 
 import nltk
 import requests
-import wikipedia as wk
+import wikipedia
 from googlesearch import search
-from nltk.corpus import wordnet as wn
+from nltk.corpus import wordnet
 from nltk.stem.wordnet import WordNetLemmatizer
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import linear_kernel
+
+from chatbot import LOGGER
 
 warnings.filterwarnings("ignore")
 nltk.download('punkt', quiet=True)
@@ -25,9 +28,12 @@ nltk.download('averaged_perceptron_tagger', quiet=True)
 class ChatBot:
 
     def __init__(self):
-        r = requests.get(url='http://www.whatishumanresource.com/human-resource-management',
-                         allow_redirects=True)
-        self.data = r.content.decode()
+        hr_data_path = Path('/tmp', '.HR.txt')
+        if not hr_data_path.exists():
+            r = requests.get(url='http://www.whatishumanresource.com/human-resource-management',
+                             allow_redirects=True)
+            hr_data_path.write_text(r.content.decode())
+        self.data = hr_data_path.read_text()
         raw = self.data.lower()
         self.sent_tokens = nltk.sent_tokenize(raw)
         self.welcome_input = ("hello",
@@ -45,24 +51,23 @@ class ChatBot:
 
     def start(self):
         flag = True
-        print("My name is Chatterbot and I'm a chatbot. If you want to exit, type Bye!")
+        LOGGER.info("My name is Chatterbot and I'm a chatbot. If you want to exit, type Bye!")
         while flag:
             user_response = input()
             user_response = user_response.lower()
             if user_response not in ['bye', 'shutdown', 'exit', 'quit']:
                 if user_response == 'thanks' or user_response == 'thank you':
                     flag = False
-                    print("Chatterbot : You are welcome..")
+                    LOGGER.info("Chatterbot : You are welcome..")
                 else:
                     if self.welcome(user_response) is not None:
-                        print(f'Chatterbot : {self.welcome(user_response)}')
+                        LOGGER.info(f'Chatterbot : {self.welcome(user_response)}')
                     else:
-                        print("Chatterbot : ", end="")
-                        print(self.generate_response(user_response))
+                        LOGGER.warning(f'{self.generate_response(user_response)}')
                         self.sent_tokens.remove(user_response)
             else:
                 flag = False
-                print("Chatterbot : Bye!!! ")
+                LOGGER.info("Chatterbot : Bye!!! ")
 
     def normalize(self, text):
         remove_punct_dict = dict((ord(punct), None) for punct in string.punctuation)
@@ -84,12 +89,12 @@ class ChatBot:
             rmv.append(text)
 
         # pos tagging and lemmatization
-        tag_map = defaultdict(lambda: wn.NOUN)
-        tag_map['J'] = wn.ADJ
-        tag_map['V'] = wn.VERB
-        tag_map['R'] = wn.ADV
+        tag_map = defaultdict(lambda: wordnet.NOUN)
+        tag_map['J'] = wordnet.ADJ
+        tag_map['V'] = wordnet.VERB
+        tag_map['R'] = wordnet.ADV
         lmtzr = WordNetLemmatizer()
-        lemma_list = []
+        lemma_list = list()
         rmv = [i for i in rmv if i]
         for token, tag in nltk.pos_tag(rmv):
             lemma = lmtzr.lemmatize(token, tag_map[tag[0]])
@@ -112,13 +117,13 @@ class ChatBot:
         flat = vals.flatten()
         flat.sort()
         req_tfidf = flat[-2]
-        if (req_tfidf == 0) or "tell me about" in user_response:
-            print("Checking Wikipedia")
+        if (req_tfidf == 0) or "wiki" in user_response:
+            LOGGER.info("Chatterbot : Checking Wikipedia")
             if user_response:
                 robo_response = self.wikipedia_data(user_response)
                 return robo_response
         if (req_tfidf == 0) or "google" in user_response:
-            print("Checking Google")
+            LOGGER.info("Chatterbot : Checking Google")
             if user_response:
                 robo_response = self.google_data(user_response)
                 return robo_response
@@ -128,14 +133,14 @@ class ChatBot:
 
     # wikipedia search
     def wikipedia_data(self, _input):
-        reg_ex = re.search('tell me about (.*)', _input)
+        reg_ex = re.search('wiki (.*)', _input)
         try:
             if reg_ex:
                 topic = reg_ex.group(1)
-                wiki = wk.summary(topic, sentences=3)
+                wiki = wikipedia.summary(topic, sentences=3)
                 return wiki
         except Exception as _:
-            print("No content has been found")
+            LOGGER.warning(f"No content for {_input} has been found")
 
     # google search
     @staticmethod
@@ -147,7 +152,7 @@ class ChatBot:
                 response = search(query=topic, num=10, stop=10)
                 return '\n'.join(list(response))
         except Exception as _:
-            print(f"No URLs related to {_input} has been found")
+            LOGGER.warning(f"No URLs related to {_input} has been found")
 
 
 if __name__ == '__main__':
