@@ -26,7 +26,7 @@ poetry shell && poetry install && poetry show --tree
 ```
 ./chatbot/bot.py
 ```
-- for wikipedia search `tell me about <search string>`
+- for wikipedia search `wiki <search string>`
 - for google search `google <search string>`
 
 ### Reference:
@@ -35,6 +35,7 @@ poetry shell && poetry install && poetry show --tree
 
 ### TODO
 - [ ] integrate more features: bing search, ?
-- [ ] add colored logger
+- [x] add colored logger
 - [ ] more natural conversational
 - [ ] search videos, news etc
+- [ ] tqdm support for search wait-time
