@@ -1,17 +1,18 @@
 #!/usr/bin/env python
-from builtins import Exception, dict, input, open, ord
-from collections import defaultdict
-
-import nltk
 import random
 import re
 import string
 import unicodedata
 import warnings
+from builtins import Exception, dict, input, ord
+from collections import defaultdict
+
+import nltk
+import requests
 import wikipedia as wk
+from googlesearch import search
 from nltk.corpus import wordnet as wn
 from nltk.stem.wordnet import WordNetLemmatizer
-from serpapi.google_search_results import GoogleSearchResults
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import linear_kernel
 
@@ -24,12 +25,22 @@ nltk.download('averaged_perceptron_tagger', quiet=True)
 class ChatBot:
 
     def __init__(self):
-        self.data = open('/Users/amit/src/scratch/chatbot/data/HR.txt', 'r', errors='ignore')
-        raw = self.data.read()
-        raw = raw.lower()
+        r = requests.get(url='http://www.whatishumanresource.com/human-resource-management',
+                         allow_redirects=True)
+        self.data = r.content.decode()
+        raw = self.data.lower()
         self.sent_tokens = nltk.sent_tokenize(raw)
-        self.welcome_input = ("hello", "hi", "greetings", "sup", "what's up", "hey",)
-        self.welcome_response = ["hi", "hey", "*nods*", "hi there", "hello",
+        self.welcome_input = ("hello",
+                              "hi",
+                              "greetings",
+                              "sup",
+                              "what's up",
+                              "hey",)
+        self.welcome_response = ["hi",
+                                 "hey",
+                                 "*nods*",
+                                 "hi there",
+                                 "hello",
                                  "I am glad! You are talking to me"]
 
     def start(self):
@@ -47,7 +58,7 @@ class ChatBot:
                         print(f'Chatterbot : {self.welcome(user_response)}')
                     else:
                         print("Chatterbot : ", end="")
-                        print(self.generateResponse(user_response))
+                        print(self.generate_response(user_response))
                         self.sent_tokens.remove(user_response)
             else:
                 flag = False
@@ -90,7 +101,7 @@ class ChatBot:
             if word.lower() in self.welcome_input:
                 return random.choice(self.welcome_response)
 
-    def generateResponse(self, user_response):
+    def generate_response(self, user_response):
         robo_response = ''
         self.sent_tokens.append(user_response)
         TfidfVec = TfidfVectorizer(tokenizer=self.normalize, stop_words='english')
@@ -133,10 +144,10 @@ class ChatBot:
         try:
             if reg_ex:
                 topic = reg_ex.group(1)
-                response = GoogleSearchResults({"q": topic, "location": "Austin,Texas"})
-                return response.get_dict()
+                response = search(query=topic, num=10, stop=10)
+                return '\n'.join(list(response))
         except Exception as _:
-            print("No content has been found")
+            print(f"No URLs related to {_input} has been found")
 
 
 if __name__ == '__main__':

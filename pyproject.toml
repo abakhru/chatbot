@@ -1,15 +1,15 @@
 [tool.poetry]
 name = "chatbot"
 version = "0.1.0"
-description = ""
-authors = ["amit-bakhru <amit@area1security.com>"]
+description = "Simple Chatbot"
+authors = ["amit-bakhru <bakhru@me.com>"]
 
 [tool.poetry.dependencies]
 python = "^3.7"
 nltk = "^3.4.5"
 wikipedia = "^1.4.0"
 sklearn = "^0.0"
-google-search-results = "^1.7.0"
+google = "^2.0.2"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
