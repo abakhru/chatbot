@@ -45,9 +45,13 @@ docker run -it chatbot bash
 ### TODO
 - [ ] mitre data search and co-relation
 - [ ] whois lookup
-- [ ] integrate more features: bing search, ?
 - [ ] more natural conversational
 - [ ] search videos, news etc
 - [ ] `tqdm` support for search wait-time
 - [x] add colored logger
 - [x] Dockerize the application
+- [ ] integrate more sources/features
+  - [ ] bing search
+  - [ ] twitter feed
+- [ ] add more topic related source urls
+- [ ] add sanic or some other web framework for REST access

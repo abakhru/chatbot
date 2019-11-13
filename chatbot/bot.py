@@ -7,10 +7,12 @@ import unicodedata
 import warnings
 from collections import defaultdict
 from pathlib import Path
+from urllib.request import urlopen
 
 import nltk
 import requests
 import wikipedia
+from bs4 import BeautifulSoup
 from googlesearch import search
 from nltk.corpus import wordnet
 from nltk.stem.wordnet import WordNetLemmatizer
@@ -145,15 +147,28 @@ class ChatBot:
         except Exception as _:
             LOGGER.warning(f"No content for {_input} has been found")
 
-    # google search
     @staticmethod
     def google_data(_input):
+        """google search"""
         reg_ex = re.search('google (.*)', _input)
         try:
             if reg_ex:
                 topic = reg_ex.group(1)
                 response = search(query=topic, num=10, stop=10)
                 return '\n'.join(list(response))
+        except Exception as _:
+            LOGGER.warning(f"No URLs related to {_input} has been found")
+
+    @staticmethod
+    def twitter_data(_input):
+        """twitter search"""
+        reg_ex = re.search('twitter (.*)', _input)
+        try:
+            if reg_ex:
+                topic = reg_ex.group(1)
+                html = urlopen(f'https://twitter.com/search?q=#{topic}&src=typd')
+                soup = BeautifulSoup(html.read(), 'html.parser')
+
         except Exception as _:
             LOGGER.warning(f"No URLs related to {_input} has been found")
 
