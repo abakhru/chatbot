@@ -29,13 +29,25 @@ poetry shell && poetry install && poetry show --tree
 - for wikipedia search `wiki <search string>`
 - for google search `google <search string>`
 
+### build docker images
+```
+cd ~/src/chatbot && docker build -t chatbot -f ./chatbot/Dockerfile .
+```
+
+#### run with docker container
+```
+docker run -it chatbot bash
+```
 ### Reference:
 - https://towardsdatascience.com/lets-build-an-intelligent-chatbot-7ea7f215ada6?gi=da4ec7aa5db6
 
 
 ### TODO
+- [ ] mitre data search and co-relation
+- [ ] whois lookup
 - [ ] integrate more features: bing search, ?
-- [x] add colored logger
 - [ ] more natural conversational
 - [ ] search videos, news etc
-- [ ] tqdm support for search wait-time
+- [ ] `tqdm` support for search wait-time
+- [x] add colored logger
+- [x] Dockerize the application

@@ -28,12 +28,7 @@ nltk.download('averaged_perceptron_tagger', quiet=True)
 class ChatBot:
 
     def __init__(self):
-        hr_data_path = Path('/tmp', '.HR.txt')
-        if not hr_data_path.exists():
-            r = requests.get(url='http://www.whatishumanresource.com/human-resource-management',
-                             allow_redirects=True)
-            hr_data_path.write_text(r.content.decode())
-        self.data = hr_data_path.read_text()
+        self.data = None
         raw = self.data.lower()
         self.sent_tokens = nltk.sent_tokenize(raw)
         self.welcome_input = ("hello",
@@ -48,6 +43,14 @@ class ChatBot:
                                  "hi there",
                                  "hello",
                                  "I am glad! You are talking to me"]
+
+    def hr_data(self):
+        self.hr_data_path = Path('/tmp', '.HR.txt')
+        if not self.hr_data_path.exists():
+            r = requests.get(url='http://www.whatishumanresource.com/human-resource-management',
+                             allow_redirects=True)
+            self.hr_data_path.write_text(r.content.decode())
+        self.hr_data_path.read_text()
 
     def start(self):
         flag = True
