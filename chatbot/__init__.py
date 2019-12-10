@@ -139,3 +139,16 @@ pairs = (
             ),
         ),
     )
+
+WELCOME_DICT = {"input": ["hello",
+                          "hi",
+                          "greetings",
+                          "sup",
+                          "what's up",
+                          "hey"],
+                "response": ["hi",
+                             "hey",
+                             "*nods*",
+                             "hi there",
+                             "hello",
+                             "I am glad! You are talking to me"]}

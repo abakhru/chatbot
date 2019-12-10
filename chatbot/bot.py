@@ -21,25 +21,12 @@ from sklearn.metrics.pairwise import linear_kernel
 from nltk.chat.util import Chat
 
 
-from chatbot import LOGGER, reflections, pairs
+from chatbot import LOGGER, reflections, pairs, WELCOME_DICT
 
 warnings.filterwarnings("ignore")
 nltk.download('punkt', quiet=True)
 nltk.download('wordnet', quiet=True)
 nltk.download('averaged_perceptron_tagger', quiet=True)
-
-WELCOME_DICT = {"input": ["hello",
-                          "hi",
-                          "greetings",
-                          "sup",
-                          "what's up",
-                          "hey"],
-                "response": ["hi",
-                             "hey",
-                             "*nods*",
-                             "hi there",
-                             "hello",
-                             "I am glad! You are talking to me"]}
 
 
 class ChatBot:
@@ -48,7 +35,8 @@ class ChatBot:
         self.sent_tokens = nltk.sent_tokenize(self.hr_data().lower())
         self.welcome_input = WELCOME_DICT['input']
         self.welcome_response = WELCOME_DICT['response']
-        self.iesha_chatbot = Chat(pairs, reflections)
+        # self.iesha_chatbot = Chat(pairs, reflections)
+        self.start()
 
     def iesha_chat(self):
         print("Iesha the TeenBoT\n---------")
@@ -64,7 +52,7 @@ class ChatBot:
             r = requests.get(url='http://www.whatishumanresource.com/human-resource-management',
                              allow_redirects=True)
             self.hr_data_path.write_text(r.content.decode())
-        self.hr_data_path.read_text()
+        return self.hr_data_path.read_text()
 
     def mitre_data(self):
         self.mitre_data_path = Path('/tmp', '.mitre.txt')
@@ -197,4 +185,4 @@ class ChatBot:
 
 if __name__ == '__main__':
     p = ChatBot()
-    p.iesha_chat()
+    # p.iesha_chat()
