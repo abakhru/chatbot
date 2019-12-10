@@ -6,14 +6,7 @@
 
 ### Install Poetry
 ```.bash
-# install poetry
-curl -sSL https://raw.githubusercontent.com/sdispater/poetry/master/get-poetry.py | python;
-# for macos
-sed -i '' 's/python/python3/' ~/.poetry/bin/poetry && . ~/.poetry/env
-# for *unix platforms
-sed -i 's/python/python3/' ~/.poetry/bin/poetry && . ~/.poetry/env
-poetry self:update --preview && poetry --version
-# makse sure the version is >=1.0.0b3 after update 
+curl -sSL https://raw.githubusercontent.com/abakhru/chatbot/master/bin/install-poetry.sh | bash; 
 ```
 
 ### install and run chatbot
@@ -31,7 +24,7 @@ poetry shell && poetry install && poetry show --tree
 
 ### build docker images
 ```
-cd ~/src/chatbot && docker build -t chatbot -f ./chatbot/Dockerfile .
+cd ~/src/chatbot && docker build -t chatbot -f chatbot/Dockerfile .
 ```
 
 #### run with docker container
@@ -40,14 +33,22 @@ docker run -it chatbot bash
 ```
 ### Reference:
 - https://towardsdatascience.com/lets-build-an-intelligent-chatbot-7ea7f215ada6?gi=da4ec7aa5db6
+- other NLTK data location: http://www.nltk.org/nltk_data/
 
 
 ### TODO
 - [ ] mitre data search and co-relation
-- [ ] whois lookup
-- [ ] integrate more features: bing search, ?
 - [ ] more natural conversational
 - [ ] search videos, news etc
-- [ ] `tqdm` support for search wait-time
+- [ ] [`tqdm`](https://github.com/tqdm/tqdm) support for search wait-time
+- [ ] add [`sanic`](https://github.com/huge-success/sanic) or some other web framework for REST access
+- [ ] add [`click`](https://github.com/pallets/click) cli support
+- [ ] integrate more sources/features
+  - [ ] bing search
+  - [ ] twitter feed
+  - [ ] whois lookup
+- [ ] add more topic related source urls
+- [ ] package the application using [`PyOxidizer`](https://github.com/indygreg/PyOxidizer)
+- [x] add tests
 - [x] add colored logger
 - [x] Dockerize the application

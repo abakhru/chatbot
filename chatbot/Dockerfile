@@ -4,14 +4,15 @@ LABEL maintainer="amit <bakhru@me.com>"
 RUN apt update && \
     apt full-upgrade -y && \
     apt autoremove -y && \
-    apt install -y curl && \
+    apt install -y --no-install-recommends curl && \
+    apt clean && apt autoremove -y && \
+    rm -rf /var/lib/apt/lists/* && \
     mkdir -p /app/chatbot
 WORKDIR /app
 
 # install poetry
-RUN curl -sSL https://raw.githubusercontent.com/sdispater/poetry/master/get-poetry.py | python && \
-    /root/.poetry/bin/poetry self:update --preview && \
-    sed -i 's/python/python3/' /root/.poetry/bin/poetry
+COPY bin/install-poetry.sh /tmp/
+RUN /tmp/install-poetry.sh
 
 COPY pyproject.toml poetry.lock /app/
 COPY chatbot/* /app/chatbot/

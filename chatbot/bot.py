@@ -7,17 +7,21 @@ import unicodedata
 import warnings
 from collections import defaultdict
 from pathlib import Path
+from urllib.request import urlopen
 
 import nltk
 import requests
 import wikipedia
+from bs4 import BeautifulSoup
 from googlesearch import search
 from nltk.corpus import wordnet
 from nltk.stem.wordnet import WordNetLemmatizer
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import linear_kernel
+from nltk.chat.util import Chat
 
-from chatbot import LOGGER
+
+from chatbot import LOGGER, reflections, pairs, WELCOME_DICT
 
 warnings.filterwarnings("ignore")
 nltk.download('punkt', quiet=True)
@@ -28,25 +32,33 @@ nltk.download('averaged_perceptron_tagger', quiet=True)
 class ChatBot:
 
     def __init__(self):
-        self.data = None
-        raw = self.data.lower()
-        self.sent_tokens = nltk.sent_tokenize(raw)
-        self.welcome_input = ("hello",
-                              "hi",
-                              "greetings",
-                              "sup",
-                              "what's up",
-                              "hey",)
-        self.welcome_response = ["hi",
-                                 "hey",
-                                 "*nods*",
-                                 "hi there",
-                                 "hello",
-                                 "I am glad! You are talking to me"]
+        self.sent_tokens = nltk.sent_tokenize(self.hr_data().lower())
+        self.welcome_input = WELCOME_DICT['input']
+        self.welcome_response = WELCOME_DICT['response']
+        # self.iesha_chatbot = Chat(pairs, reflections)
+        self.start()
+
+    def iesha_chat(self):
+        print("Iesha the TeenBoT\n---------")
+        print("Talk to the program by typing in plain English, using normal upper-")
+        print('and lower-case letters and punctuation.  Enter "quit" when done.')
+        print('=' * 72)
+        print("hi!! i'm iesha! who r u??!")
+        self.iesha_chatbot.converse()
 
     def hr_data(self):
         self.hr_data_path = Path('/tmp', '.HR.txt')
         if not self.hr_data_path.exists():
+            r = requests.get(url='http://www.whatishumanresource.com/human-resource-management',
+                             allow_redirects=True)
+            self.hr_data_path.write_text(r.content.decode())
+        return self.hr_data_path.read_text()
+
+    def mitre_data(self):
+        self.mitre_data_path = Path('/tmp', '.mitre.txt')
+        urls = ['https://www.exabeam.com/information-security/what-is-mitre-attck-an-explainer/',
+                '']
+        if not self.mitre_data_path.exists():
             r = requests.get(url='http://www.whatishumanresource.com/human-resource-management',
                              allow_redirects=True)
             self.hr_data_path.write_text(r.content.decode())
@@ -145,9 +157,9 @@ class ChatBot:
         except Exception as _:
             LOGGER.warning(f"No content for {_input} has been found")
 
-    # google search
     @staticmethod
     def google_data(_input):
+        """google search"""
         reg_ex = re.search('google (.*)', _input)
         try:
             if reg_ex:
@@ -157,7 +169,20 @@ class ChatBot:
         except Exception as _:
             LOGGER.warning(f"No URLs related to {_input} has been found")
 
+    @staticmethod
+    def twitter_data(_input):
+        """twitter search"""
+        reg_ex = re.search('twitter (.*)', _input)
+        try:
+            if reg_ex:
+                topic = reg_ex.group(1)
+                html = urlopen(f'https://twitter.com/search?q=#{topic}&src=typd')
+                soup = BeautifulSoup(html.read(), 'html.parser')
+
+        except Exception as _:
+            LOGGER.warning(f"No URLs related to {_input} has been found")
+
 
 if __name__ == '__main__':
     p = ChatBot()
-    p.start()
+    # p.iesha_chat()
