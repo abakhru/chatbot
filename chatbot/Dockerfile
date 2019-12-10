@@ -4,7 +4,9 @@ LABEL maintainer="amit <bakhru@me.com>"
 RUN apt update && \
     apt full-upgrade -y && \
     apt autoremove -y && \
-    apt install -y curl && \
+    apt install -y --no-install-recommends curl && \
+    apt clean && apt autoremove -y && \
+    rm -rf /var/lib/apt/lists/* && \
     mkdir -p /app/chatbot
 WORKDIR /app
 

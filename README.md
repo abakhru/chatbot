@@ -31,7 +31,7 @@ poetry shell && poetry install && poetry show --tree
 
 ### build docker images
 ```
-cd ~/src/chatbot && docker build -t chatbot -f ./chatbot/Dockerfile .
+cd ~/src/chatbot && docker build -t chatbot -f chatbot/Dockerfile .
 ```
 
 #### run with docker container
@@ -40,6 +40,7 @@ docker run -it chatbot bash
 ```
 ### Reference:
 - https://towardsdatascience.com/lets-build-an-intelligent-chatbot-7ea7f215ada6?gi=da4ec7aa5db6
+- other NLTK data location: http://www.nltk.org/nltk_data/
 
 
 ### TODO
@@ -55,3 +56,8 @@ docker run -it chatbot bash
   - [ ] twitter feed
 - [ ] add more topic related source urls
 - [ ] add sanic or some other web framework for REST access
+- [ ] Dockerize the app
+- [ ] add `click` cli support
+- [ ] add tests
+- [ ] package the application using [PyOxidizer](https://github.com/indygreg/PyOxidizer)
+
