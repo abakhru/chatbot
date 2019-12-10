@@ -11,9 +11,8 @@ RUN apt update && \
 WORKDIR /app
 
 # install poetry
-RUN curl -sSL https://raw.githubusercontent.com/sdispater/poetry/master/get-poetry.py | python && \
-    /root/.poetry/bin/poetry self:update --preview && \
-    sed -i 's/python/python3/' /root/.poetry/bin/poetry
+COPY bin/install-poetry.sh /tmp/
+RUN /tmp/install-poetry.sh
 
 COPY pyproject.toml poetry.lock /app/
 COPY chatbot/* /app/chatbot/

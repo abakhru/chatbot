@@ -6,14 +6,7 @@
 
 ### Install Poetry
 ```.bash
-# install poetry
-curl -sSL https://raw.githubusercontent.com/sdispater/poetry/master/get-poetry.py | python;
-# for macos
-sed -i '' 's/python/python3/' ~/.poetry/bin/poetry && . ~/.poetry/env
-# for *unix platforms
-sed -i 's/python/python3/' ~/.poetry/bin/poetry && . ~/.poetry/env
-poetry self:update --preview && poetry --version
-# makse sure the version is >=1.0.0b3 after update 
+curl -sSL https://raw.githubusercontent.com/abakhru/chatbot/master/bin/install-poetry.sh | bash; 
 ```
 
 ### install and run chatbot
@@ -45,19 +38,17 @@ docker run -it chatbot bash
 
 ### TODO
 - [ ] mitre data search and co-relation
-- [ ] whois lookup
 - [ ] more natural conversational
 - [ ] search videos, news etc
-- [ ] `tqdm` support for search wait-time
-- [x] add colored logger
-- [x] Dockerize the application
+- [ ] [`tqdm`](https://github.com/tqdm/tqdm) support for search wait-time
+- [ ] add [`sanic`](https://github.com/huge-success/sanic) or some other web framework for REST access
+- [ ] add [`click`](https://github.com/pallets/click) cli support
 - [ ] integrate more sources/features
   - [ ] bing search
   - [ ] twitter feed
+  - [ ] whois lookup
 - [ ] add more topic related source urls
-- [ ] add sanic or some other web framework for REST access
-- [ ] Dockerize the app
-- [ ] add `click` cli support
-- [ ] add tests
-- [ ] package the application using [PyOxidizer](https://github.com/indygreg/PyOxidizer)
-
+- [ ] package the application using [`PyOxidizer`](https://github.com/indygreg/PyOxidizer)
+- [x] add tests
+- [x] add colored logger
+- [x] Dockerize the application
