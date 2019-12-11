@@ -41,13 +41,13 @@ docker run -it chatbot bash
 - [ ] more natural conversational
 - [ ] search videos, news etc
 - [ ] [`tqdm`](https://github.com/tqdm/tqdm) support for search wait-time
-- [ ] add [`sanic`](https://github.com/huge-success/sanic) or some other web framework for REST access
+- [x] add [`fastapi`](https://github.com/tiangolo/fastapi) web framework for REST/Web access
 - [ ] add [`click`](https://github.com/pallets/click) cli support
 - [ ] integrate more sources/features
-  - [ ] bing search
+  - [x] google search
   - [ ] twitter feed
-  - [ ] whois lookup
   - [x] maxmind geoip lookup
+  - [x] whois lookup
 - [ ] add more topic related source urls
 - [ ] package the application using [`PyOxidizer`](https://github.com/indygreg/PyOxidizer)
 - [x] add tests

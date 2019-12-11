@@ -2,6 +2,7 @@ import logging
 
 from colorlog import ColoredFormatter
 
+WHOIS_API_KEY = '73ioc7xawi00DK2G4qpOEcml8TegKDuI'
 LOGGER = logging.getLogger(__name__)
 FORMAT = '%(log_color)s%(message)s%(reset)s'
 V_LEVELS = {0: logging.ERROR,

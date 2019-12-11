@@ -19,7 +19,7 @@ from nltk.stem.wordnet import WordNetLemmatizer
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import linear_kernel
 
-from chatbot import LOGGER, WELCOME_DICT
+from chatbot import LOGGER, WELCOME_DICT, WHOIS_API_KEY
 from chatbot.maxminddb_mgr import MaxmindDBManager
 
 warnings.filterwarnings("ignore")
@@ -90,6 +90,21 @@ class ChatBot:
 
     def close(self):
         self.maxmind_reader.close()
+
+    def respond(self, input_):
+        user_response = input_.lower()
+        if user_response not in ['bye', 'shutdown', 'exit', 'quit']:
+            if user_response == 'thanks' or user_response == 'thank you':
+                response = "Chatterbot : You are welcome.."
+            else:
+                if self.welcome(user_response) is not None:
+                    response = self.welcome(user_response)
+                else:
+                    response = self.generate_response(user_response)
+                    self.sent_tokens.remove(user_response)
+        else:
+            response = "Chatterbot : Bye!!! "
+        return response
 
     def normalize(self, text):
         remove_punct_dict = dict((ord(punct), None) for punct in string.punctuation)
@@ -260,6 +275,45 @@ class ChatBot:
         except Exception as e:
             LOGGER.error(e)
             LOGGER.warning(f"No valid IP {reg_ex.group(1)} has been found")
+
+    @staticmethod
+    def check_ip(_ip):
+        # regex for validating an Ip-address
+        regex = '''^(25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)\.( 
+                        25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)\.( 
+                        25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)\.( 
+                        25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)'''
+
+        if re.search(regex, _ip):
+            return True
+        else:
+            return False
+
+    def check_if_url_domain_ip(self, request_data):
+        _response = None
+        if self.check_ip(request_data):
+            _response = f'ip_address={request_data}'
+        if request_data == 'domain':
+            _response = f'domain={request_data}'
+        if request_data == 'url':
+            _response = f'url={request_data}'
+        return _response.split('=')[0], _response
+
+    def whois_lookup(self, _input):
+        """whois lookup"""
+        api_key = f'key={WHOIS_API_KEY}'
+        reg_ex = re.search('whois (.*)', _input)
+        try:
+            if reg_ex:
+                topic = reg_ex.group(1)
+                _type, _response = self.check_if_url_domain_ip(topic)
+                url = f'https://api.jsonwhois.io/whois/{_type}?{api_key}&{_response}'
+                response = requests.get(url)
+                # html = urlopen(f'https://twitter.com/search?q=#{topic}&src=typd')
+                # soup = BeautifulSoup(html.read(), 'html.parser')
+
+        except Exception as _:
+            LOGGER.warning(f"No URLs related to {_input} has been found")
 
 
 if __name__ == '__main__':
