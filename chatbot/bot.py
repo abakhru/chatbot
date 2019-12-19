@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-
 import random
 import re
 import string
@@ -9,6 +8,7 @@ from collections import defaultdict
 from pathlib import Path
 from urllib.request import urlopen
 
+import ijson
 import nltk
 import requests
 import wikipedia
@@ -18,10 +18,8 @@ from nltk.corpus import wordnet
 from nltk.stem.wordnet import WordNetLemmatizer
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import linear_kernel
-from nltk.chat.util import Chat
 
-
-from chatbot import LOGGER, reflections, pairs, WELCOME_DICT
+from chatbot import LOGGER, WELCOME_DICT
 
 warnings.filterwarnings("ignore")
 nltk.download('punkt', quiet=True)
@@ -32,10 +30,13 @@ nltk.download('averaged_perceptron_tagger', quiet=True)
 class ChatBot:
 
     def __init__(self):
-        self.sent_tokens = nltk.sent_tokenize(self.hr_data().lower())
         self.welcome_input = WELCOME_DICT['input']
         self.welcome_response = WELCOME_DICT['response']
         # self.iesha_chatbot = Chat(pairs, reflections)
+        self.hr_data = self.get_hr_data()
+        # self.mitre_data = self.get_mitre_data()
+        self.sent_tokens = nltk.sent_tokenize(self.hr_data.lower())
+        # self.sent_tokens = nltk.sent_tokenize(self.mitre_data.lower())
         self.start()
 
     def iesha_chat(self):
@@ -46,23 +47,23 @@ class ChatBot:
         print("hi!! i'm iesha! who r u??!")
         self.iesha_chatbot.converse()
 
-    def hr_data(self):
-        self.hr_data_path = Path('/tmp', '.HR.txt')
-        if not self.hr_data_path.exists():
+    @staticmethod
+    def get_hr_data():
+        hr_data_path = Path('/tmp', '.HR.txt')
+        if not hr_data_path.exists():
             r = requests.get(url='http://www.whatishumanresource.com/human-resource-management',
                              allow_redirects=True)
-            self.hr_data_path.write_text(r.content.decode())
-        return self.hr_data_path.read_text()
+            hr_data_path.write_text(r.content.decode())
+        return hr_data_path.read_text()
 
-    def mitre_data(self):
-        self.mitre_data_path = Path('/tmp', '.mitre.txt')
+    def get_mitre_data(self):
+        mitre_data_path = Path('/tmp', '.mitre.txt')
         urls = ['https://www.exabeam.com/information-security/what-is-mitre-attck-an-explainer/',
-                '']
-        if not self.mitre_data_path.exists():
-            r = requests.get(url='http://www.whatishumanresource.com/human-resource-management',
-                             allow_redirects=True)
-            self.hr_data_path.write_text(r.content.decode())
-        self.hr_data_path.read_text()
+                'https://github.com/mitre/cti/raw/master/enterprise-attack/enterprise-attack.json']
+        if not mitre_data_path.exists():
+            r = requests.get(urls[1])
+            mitre_data_path.write_text(r.text)
+        return mitre_data_path.read_text()
 
     def start(self):
         flag = True
@@ -132,6 +133,11 @@ class ChatBot:
         flat = vals.flatten()
         flat.sort()
         req_tfidf = flat[-2]
+        if (req_tfidf == 0) or "mitre" in user_response:
+            LOGGER.info("Chatterbot : Checking Mitre")
+            if user_response:
+                robo_response = self.mitre_data(user_response)
+                return robo_response
         if (req_tfidf == 0) or "wiki" in user_response:
             LOGGER.info("Chatterbot : Checking Wikipedia")
             if user_response:
@@ -178,7 +184,53 @@ class ChatBot:
                 topic = reg_ex.group(1)
                 html = urlopen(f'https://twitter.com/search?q=#{topic}&src=typd')
                 soup = BeautifulSoup(html.read(), 'html.parser')
+        except Exception as _:
+            LOGGER.warning(f"No URLs related to {_input} has been found")
 
+    @staticmethod
+    def search_names(_name):
+        m = Path('/tmp', '.mitre.txt')
+        name_id_dict = list()  # list of dict
+        for _item in ijson.items(m.open(), 'objects.item'):
+            if _item.get('name') and _name in _item.get('name'):
+                if isinstance(_item.get('external_references'), list):
+                    name_id_dict.append({'name': _item['name'],
+                                         'external_id': [refs['external_id']
+                                                         for refs in _item['external_references']
+                                                         if refs.get('external_id')][0]
+                                         })
+        return name_id_dict
+
+    @staticmethod
+    def search_t_id(_id):
+        m = Path('/tmp', '.mitre.txt')
+        for _item in ijson.items(m.open(), 'objects.item'):
+            if isinstance(_item.get('external_references'), list):
+                for refs in _item['external_references']:
+                    if refs.get('external_id') and refs.get('external_id') == _id:
+                        return _item
+
+    def mitre_data(self, _input):
+        """mitre search"""
+        reg_ex = re.search('mitre (.*)', _input)
+        LOGGER.debug(f'regex: {reg_ex}')
+        try:
+            if reg_ex:
+                topic = reg_ex.group(1).capitalize()
+                LOGGER.debug(f'topic: {topic}')
+                response = list()
+                if topic.startswith('T'):
+                    _item = self.search_t_id(topic)
+                    response = [f"**** {_item.get('name')} ****",
+                                _item.get('description'),
+                                '=' * 100]
+                else:
+                    _item = self.search_names(topic)
+                    response.append(f"**** Attack Types containing name '{topic}' ****")
+                    for i in _item:
+                        response.append(f'{i["external_id"]}: {i["name"]}')
+                    response.append('=' * 100)
+                return '\n'.join(response)
         except Exception as _:
             LOGGER.warning(f"No URLs related to {_input} has been found")
 
