@@ -23,7 +23,6 @@ pywebcopy = "^6.1.0"
 pyquery = "^1.4.1"
 w3lib = "^1.21.0"
 parse = "^1.12.1"
-httpx = "^0.9.4"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
