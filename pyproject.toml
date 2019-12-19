@@ -5,7 +5,7 @@ description = "Simple Chatbot"
 authors = ["amit-bakhru <bakhru@me.com>"]
 
 [tool.poetry.dependencies]
-python = "^3.7"
+python = "^3.8"
 nltk = "^3.4.5"
 wikipedia = "^1.4.0"
 sklearn = "^0.0"
@@ -23,6 +23,7 @@ pywebcopy = "^6.1.0"
 pyquery = "^1.4.1"
 w3lib = "^1.21.0"
 parse = "^1.12.1"
+httpx = "^0.9.4"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
