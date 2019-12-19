@@ -21,6 +21,8 @@ poetry shell && poetry install && poetry show --tree
 ```
 - for wikipedia search `wiki <search string>`
 - for google search `google <search string>`
+- for mitre T-id search `mitre T1105`
+- for mitre attack type search `mitre Management`, will list attack types with T<id>
 
 ### build docker images
 ```
@@ -37,7 +39,7 @@ docker run -it chatbot bash
 
 
 ### TODO
-- [ ] mitre data search and co-relation
+- [x] mitre data search and co-relation
 - [ ] more natural conversational
 - [ ] search videos, news etc
 - [ ] [`tqdm`](https://github.com/tqdm/tqdm) support for search wait-time
