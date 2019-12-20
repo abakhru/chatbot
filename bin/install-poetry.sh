@@ -9,4 +9,4 @@ else
   sed -i 's/python/python3/' ~/.poetry/bin/poetry && source "${HOME}/.poetry/env"
 fi
 
-poetry self:update --preview && poetry --version
+poetry self update --preview && poetry --version
