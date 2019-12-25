@@ -6,7 +6,7 @@
 
 ### Install Poetry
 ```.bash
-curl -sSL https://raw.githubusercontent.com/abakhru/chatbot/master/bin/install-poetry.sh | bash; 
+python3 -m pip install --pre poetry
 ```
 
 ### install and run chatbot
