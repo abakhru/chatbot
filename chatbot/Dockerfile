@@ -10,12 +10,13 @@ RUN useradd -m -d /home/${USER} -s /bin/bash ${USER} && \
 RUN apt update && \
     apt full-upgrade -y && \
     apt autoremove -y && \
-    apt install -y --no-install-recommends curl && \
+    apt install -y --no-install-recommends curl gcc libc-dev && \
     apt clean && apt autoremove -y && rm -rf /var/lib/apt/lists/* && \
     mkdir -p /app/chatbot && \
-    chown -R ${USER}:${USER} /app && \
-    python3 -m pip install -q --pre poetry && \
-    python3 -m pip install -q -U pip setuptools
+    chown -R ${USER}:${USER} /app
+
+RUN python3 -m pip install -q -U pip setuptools && \
+    python3 -m pip install -q --pre poetry
 
 USER ${USER}
 COPY pyproject.toml poetry.lock /app/
@@ -23,7 +24,7 @@ COPY chatbot/* /app/chatbot/
 
 USER ${USER}
 WORKDIR /app
-RUN python3 -m poetry install -vv && \
+RUN python3 -m poetry install && \
     # download nltk files
     python3 -m poetry run python -c "import nltk; nltk.download('punkt', quiet=False)" && \
     python3 -m poetry run python -c "import nltk; nltk.download('wordnet', quiet=False)" && \
