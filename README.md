@@ -47,6 +47,7 @@ docker run -it chatbot bash
   - [ ] bing search
   - [ ] twitter feed
   - [ ] whois lookup
+  - [x] maxmind geoip lookup
 - [ ] add more topic related source urls
 - [ ] package the application using [`PyOxidizer`](https://github.com/indygreg/PyOxidizer)
 - [x] add tests
