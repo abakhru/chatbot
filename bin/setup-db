@@ -1,0 +1,29 @@
+#!/bin/bash
+
+pg_data_dir='/tmp/postgres'
+db_user='crud_trials'
+db_name=${db_user}
+
+/usr/local/Cellar/postgresql/12.1/bin/pg_ctl -D ${pg_data_dir} stop
+sleep 2
+rm -rf ${pg_data_dir}
+/usr/local/Cellar/postgresql/12.1/bin/initdb -D ${pg_data_dir}
+/usr/local/Cellar/postgresql/12.1/bin/pg_ctl -D ${pg_data_dir} start
+
+psql -U "${USER}" -h 127.0.0.1 postgres <<EOF
+\x
+create user ${db_user};
+create role ${db_user};
+alter role ${db_user} with login;
+create database ${db_name} with owner ${db_user};
+alter user ${db_user} with encrypted password '${db_user}';
+grant all on database ${db_name} to ${db_user};
+\q
+EOF
+
+psql -U "${USER}" -h 127.0.0.1 postgres <<EOF
+\x
+CREATE TABLE data(name text);
+ALTER TABLE data OWNER TO ${db_user};
+\q
+EOF
