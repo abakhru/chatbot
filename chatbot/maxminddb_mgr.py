@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import json
+import subprocess
 from pathlib import Path
 
 import maxminddb
@@ -11,7 +12,9 @@ class MaxmindDBManager:
     LICENSE_KEY = ''
 
     def __init__(self):
-        self.maxmind_db_files = list(Path(__file__).parent.parent.joinpath('data').rglob('*.mmdb'))
+        self.app_home = Path(__file__).parent.parent
+        self.maxmind_db_files = list(self.app_home.joinpath('data').rglob('*.mmdb'))
+        self.download_latest()
         LOGGER.debug(f'maxmind files: {self.maxmind_db_files}')
         self.reader = dict()
         for _file in self.maxmind_db_files:
@@ -31,7 +34,12 @@ class MaxmindDBManager:
             v['reader'].close()
 
     def download_latest(self):
-        pass
+        if not len(self.maxmind_db_files):
+            cmd = (f'geoipupdate '
+                   f'-f {self.app_home}/config/GeoIP.conf '
+                   f'--database-directory {self.app_home}/data -v')
+            subprocess.check_output(cmd, shell=True)
+            self.maxmind_db_files = list(self.app_home.joinpath('data').rglob('*.mmdb'))
 
     def find(self, query):
         """

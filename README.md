@@ -33,6 +33,14 @@ cd ~/src/chatbot && docker build -t chatbot -f chatbot/Dockerfile .
 ```
 docker run -it chatbot bash
 ```
+
+#### geoip db update
+```
+# install https://github.com/maxmind/geoipupdate
+# download latest database using following command:
+cd ~/src/chatbot && geoipupdate -f config/GeoIP.conf --database-directory ./data -v
+```
+
 ### Reference:
 - https://towardsdatascience.com/lets-build-an-intelligent-chatbot-7ea7f215ada6?gi=da4ec7aa5db6
 - other NLTK data location: http://www.nltk.org/nltk_data/
