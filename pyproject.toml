@@ -23,6 +23,9 @@ pywebcopy = "^6.1.0"
 pyquery = "^1.4.1"
 w3lib = "^1.21.0"
 parse = "^1.12.1"
+psycopg2 = "^2.8.4"
+ijson = "^2.5.1"
+networkx = "^2.4"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
@@ -33,5 +36,5 @@ pytest-picked = "^0.4.1"
 pytest-tldr = "^0.2.1"
 
 [build-system]
-requires = ["poetry>=0.12"]
+requires = ["poetry>=1.0"]
 build-backend = "poetry.masonry.api"

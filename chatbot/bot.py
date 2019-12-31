@@ -20,6 +20,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import linear_kernel
 
 from chatbot import LOGGER, WELCOME_DICT
+from chatbot.maxminddb_mgr import MaxmindDBManager
 
 warnings.filterwarnings("ignore")
 nltk.download('punkt', quiet=True)
@@ -36,6 +37,7 @@ class ChatBot:
         self.hr_data = self.get_hr_data()
         # self.mitre_data = self.get_mitre_data()
         self.sent_tokens = nltk.sent_tokenize(self.hr_data.lower())
+        self.maxmind_reader = MaxmindDBManager()
         # self.sent_tokens = nltk.sent_tokenize(self.mitre_data.lower())
         self.start()
 
@@ -83,7 +85,11 @@ class ChatBot:
                         self.sent_tokens.remove(user_response)
             else:
                 flag = False
+                self.close()
                 LOGGER.info("Chatterbot : Bye!!! ")
+
+    def close(self):
+        self.maxmind_reader.close()
 
     def normalize(self, text):
         remove_punct_dict = dict((ord(punct), None) for punct in string.punctuation)
@@ -133,6 +139,7 @@ class ChatBot:
         flat = vals.flatten()
         flat.sort()
         req_tfidf = flat[-2]
+        req_tfidf = 1
         if (req_tfidf == 0) or "mitre" in user_response:
             LOGGER.info("Chatterbot : Checking Mitre")
             if user_response:
@@ -147,6 +154,11 @@ class ChatBot:
             LOGGER.info("Chatterbot : Checking Google")
             if user_response:
                 robo_response = self.google_data(user_response)
+                return robo_response
+        if (req_tfidf == 0) or "geoip" in user_response:
+            LOGGER.info("Chatterbot : Checking GeoIP LookUP")
+            if user_response:
+                robo_response = self.geoip_lookup(user_response)
                 return robo_response
         else:
             robo_response = robo_response + self.sent_tokens[idx]
@@ -233,6 +245,21 @@ class ChatBot:
                 return '\n'.join(response)
         except Exception as _:
             LOGGER.warning(f"No URLs related to {_input} has been found")
+
+    def geoip_lookup(self, _input):
+        """geoip lookup"""
+        # extract IPv4 address from the string
+        reg_ex = re.search(r'((?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?\.){3}'
+                           r'(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)))', _input)
+        LOGGER.debug(f'regex: {reg_ex}')
+        try:
+            if reg_ex:
+                topic = reg_ex.group(1)
+                LOGGER.debug(f'topic: {topic}')
+                return self.maxmind_reader.find(topic)
+        except Exception as e:
+            LOGGER.error(e)
+            LOGGER.warning(f"No valid IP {reg_ex.group(1)} has been found")
 
 
 if __name__ == '__main__':
