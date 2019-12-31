@@ -1,6 +1,8 @@
 #!/usr/bin/env python
+import os
 import random
 import re
+import ssl
 import string
 import unicodedata
 import warnings
@@ -10,6 +12,7 @@ from urllib.request import urlopen
 
 import ijson
 import nltk
+import pandas
 import requests
 import wikipedia
 from bs4 import BeautifulSoup
@@ -18,6 +21,7 @@ from nltk.corpus import wordnet
 from nltk.stem.wordnet import WordNetLemmatizer
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import linear_kernel
+from tabulate import tabulate
 
 from chatbot import LOGGER, WELCOME_DICT, WHOIS_API_KEY
 from chatbot.maxminddb_mgr import MaxmindDBManager
@@ -26,6 +30,17 @@ warnings.filterwarnings("ignore")
 nltk.download('punkt', quiet=True)
 nltk.download('wordnet', quiet=True)
 nltk.download('averaged_perceptron_tagger', quiet=True)
+
+
+def check_ssl(func):
+    def wrap(*args, **kwargs):
+        if not os.environ.get("PYTHONHTTPSVERIFY", "") and getattr(
+                ssl, "_create_unverified_context", None
+                ):
+            ssl._create_default_https_context = ssl._create_unverified_context
+        return func(*args, **kwargs)
+
+    return wrap
 
 
 class ChatBot:
@@ -39,7 +54,7 @@ class ChatBot:
         self.sent_tokens = nltk.sent_tokenize(self.hr_data.lower())
         self.maxmind_reader = MaxmindDBManager()
         # self.sent_tokens = nltk.sent_tokenize(self.mitre_data.lower())
-        self.start()
+        # self.start()
 
     def iesha_chat(self):
         print("Iesha the TeenBoT\n---------")
@@ -165,7 +180,7 @@ class ChatBot:
             if user_response:
                 robo_response = self.wikipedia_data(user_response)
                 return robo_response
-        if (req_tfidf == 0) or "google" in user_response:
+        if (req_tfidf == 0) or "google" in user_response and 'google.com' not in user_response:
             LOGGER.info("Chatterbot : Checking Google")
             if user_response:
                 robo_response = self.google_data(user_response)
@@ -174,6 +189,11 @@ class ChatBot:
             LOGGER.info("Chatterbot : Checking GeoIP LookUP")
             if user_response:
                 robo_response = self.geoip_lookup(user_response)
+                return robo_response
+        if (req_tfidf == 0) or "whois" in user_response:
+            LOGGER.info("Chatterbot : Checking Whois LookUP")
+            if user_response:
+                robo_response = self.whois_lookup(user_response)
                 return robo_response
         else:
             robo_response = robo_response + self.sent_tokens[idx]
@@ -299,23 +319,23 @@ class ChatBot:
             _response = f'url={request_data}'
         return _response.split('=')[0], _response
 
+    @check_ssl
     def whois_lookup(self, _input):
         """whois lookup"""
-        api_key = f'key={WHOIS_API_KEY}'
         reg_ex = re.search('whois (.*)', _input)
-        try:
-            if reg_ex:
-                topic = reg_ex.group(1)
-                _type, _response = self.check_if_url_domain_ip(topic)
-                url = f'https://api.jsonwhois.io/whois/{_type}?{api_key}&{_response}'
-                response = requests.get(url)
-                # html = urlopen(f'https://twitter.com/search?q=#{topic}&src=typd')
-                # soup = BeautifulSoup(html.read(), 'html.parser')
-
-        except Exception as _:
-            LOGGER.warning(f"No URLs related to {_input} has been found")
+        if reg_ex:
+            topic = reg_ex.group(1)
+            url = f"https://viewdns.info/whois/?domain={topic}"
+            try:
+                response = requests.get(url, headers={"User-Agent": "Mozilla/5.0"}).text
+                result = pandas.read_html(response)
+                import pdb;pdb.set_trace()
+                return result[3]
+            except Exception as e:
+                LOGGER.warning(f"[!] Couldn't send query, error: {e}...\n")
 
 
 if __name__ == '__main__':
     p = ChatBot()
+    p.start()
     # p.iesha_chat()
