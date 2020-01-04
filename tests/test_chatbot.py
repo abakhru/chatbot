@@ -22,5 +22,4 @@ class TestChatBot(TestCase):
     def test_whois(self, _input, expected_response):
         response = self.bot.respond(_input)
         LOGGER.debug(tabulate(response, tablefmt='sql'))
-        import pdb;pdb.set_trace()
         assert expected_response in [i for i in response[2]]

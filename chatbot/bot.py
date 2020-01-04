@@ -21,9 +21,8 @@ from nltk.corpus import wordnet
 from nltk.stem.wordnet import WordNetLemmatizer
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import linear_kernel
-from tabulate import tabulate
 
-from chatbot import LOGGER, WELCOME_DICT, WHOIS_API_KEY
+from chatbot import LOGGER, WELCOME_DICT
 from chatbot.maxminddb_mgr import MaxmindDBManager
 
 warnings.filterwarnings("ignore")
@@ -329,7 +328,6 @@ class ChatBot:
             try:
                 response = requests.get(url, headers={"User-Agent": "Mozilla/5.0"}).text
                 result = pandas.read_html(response)
-                import pdb;pdb.set_trace()
                 return result[3]
             except Exception as e:
                 LOGGER.warning(f"[!] Couldn't send query, error: {e}...\n")
