@@ -31,7 +31,7 @@ cd ~/src/chatbot && docker build -t chatbot -f chatbot/Dockerfile .
 
 #### run with docker container
 ```
-docker run -it chatbot bash
+docker run -it --rm chatbot bash
 ```
 
 #### geoip db update
@@ -63,3 +63,4 @@ cd ~/src/chatbot && geoipupdate -f config/GeoIP.conf --database-directory ./data
 - [x] add tests
 - [x] add colored logger
 - [x] Dockerize the application
+- [x] add [netdata](https://github.com/netdata/netdata) monitoring support
