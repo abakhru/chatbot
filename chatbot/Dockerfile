@@ -19,7 +19,7 @@ RUN python3 -m pip install -q -U pip setuptools && \
     python3 -m pip install -q --pre poetry
 
 USER ${USER}
-COPY pyproject.toml poetry.lock /app/
+COPY pyproject.toml /app/
 COPY chatbot/* /app/chatbot/
 
 USER ${USER}
@@ -28,6 +28,9 @@ RUN python3 -m poetry install && \
     # download nltk files
     python3 -m poetry run python -c "import nltk; nltk.download('punkt', quiet=False)" && \
     python3 -m poetry run python -c "import nltk; nltk.download('wordnet', quiet=False)" && \
-    python3 -m poetry run python -c "import nltk; nltk.download('averaged_perceptron_tagger', quiet=False)"
+    python3 -m poetry run python -c "import nltk; nltk.download('averaged_perceptron_tagger', quiet=False)" && \
+    echo 'source "$(poetry env info -p)/bin/activate"' >> /home/${USER}/.bashrc
 
-CMD ["/usr/local/bin/poetry", "run", "python", "chatbot/bot.py"]
+#CMD ["/usr/local/bin/poetry", "run", "python", "chatbot/bot.py"]
+#CMD ["/usr/local/bin/poetry", "run", "python", "-m uvicorn main:app --reload"]
+CMD ["bash", "-c", "python", "-m uvicorn main:app --reload"]

@@ -29,6 +29,7 @@ uvicorn = "^0.10.8"
 pandas = "^0.25.3"
 parameterized = "^0.7.1"
 tabulate = "^0.8.6"
+docker-py = "^1.10.6"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
@@ -37,7 +38,37 @@ pytest-cov = "^2.8.1"
 pytest-instafail = "^0.4.1"
 pytest-picked = "^0.4.1"
 pytest-tldr = "^0.2.1"
+bandit = "^1.6.2"
+black = "^19.10b0"
+
+[tool.bandit]
+targets = ["chatbot"]
+skips = ["B101", "B110"]
+[tool.black]
+line-length = 100
+target-version = ['py37']
+include = '\.pyi?$'
+exclude = '''
+
+(
+  /(
+      \.eggs         # exclude a few common directories in the
+    | \.git          # root of the project
+    | \.hg
+    | \.mypy_cache
+    | \.tox
+    | \.venv
+    | _build
+    | buck-out
+    | build
+    | dist
+  )/
+  | foo.py           # also separately exclude a file named foo.py in
+                     # the root of the project
+)
+'''
 
 [build-system]
-requires = ["poetry>=1.0"]
+requires = ["poetry>=1.0", "pip>=19.3.1", "setuptools>=45.0.0"]
 build-backend = "poetry.masonry.api"
+
