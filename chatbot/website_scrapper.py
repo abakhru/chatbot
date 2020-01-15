@@ -6,7 +6,6 @@ from pywebcopy import save_website
 
 
 class WebsiteScrapper:
-
     def __init__(self, project_name=None, page_url=None):
         self.url = None
         self.dest_dir = '/tmp'

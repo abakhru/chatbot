@@ -1,25 +1,36 @@
-FROM python:3.7-slim-buster
+FROM python:3.8-slim-buster
 LABEL maintainer="amit <bakhru@me.com>"
+
+ENV USER=botuser
+# create a non-root default user
+RUN useradd -m -d /home/${USER} -s /bin/bash ${USER} && \
+    echo "${USER}:${USER}" | chpasswd && \
+    adduser ${USER} sudo
 
 RUN apt update && \
     apt full-upgrade -y && \
     apt autoremove -y && \
-    apt install -y --no-install-recommends curl && \
-    apt clean && apt autoremove -y && \
-    rm -rf /var/lib/apt/lists/* && \
-    mkdir -p /app/chatbot
-WORKDIR /app
+    apt install -y --no-install-recommends curl gcc libc-dev && \
+    apt clean && apt autoremove -y && rm -rf /var/lib/apt/lists/* && \
+    mkdir -p /app/chatbot && \
+    chown -R ${USER}:${USER} /app
 
-# install poetry
-COPY bin/install-poetry.sh /tmp/
-RUN /tmp/install-poetry.sh
+RUN python3 -m pip install -q -U pip setuptools && \
+    python3 -m pip install -q --pre poetry
 
-COPY pyproject.toml poetry.lock /app/
+USER ${USER}
+COPY pyproject.toml /app/
 COPY chatbot/* /app/chatbot/
-RUN /root/.poetry/bin/poetry install
 
-# download nltk files
-RUN /root/.poetry/bin/poetry run python -c "import nltk; nltk.download('punkt', quiet=False)" && \
-    /root/.poetry/bin/poetry run python -c "import nltk; nltk.download('wordnet', quiet=False)" && \
-    /root/.poetry/bin/poetry run python -c "import nltk; nltk.download('averaged_perceptron_tagger', quiet=False)"
-CMD ["/root/.poetry/bin/poetry", "run", "python", "chatbot/bot.py"]
+USER ${USER}
+WORKDIR /app
+RUN python3 -m poetry install && \
+    # download nltk files
+    python3 -m poetry run python -c "import nltk; nltk.download('punkt', quiet=False)" && \
+    python3 -m poetry run python -c "import nltk; nltk.download('wordnet', quiet=False)" && \
+    python3 -m poetry run python -c "import nltk; nltk.download('averaged_perceptron_tagger', quiet=False)" && \
+    echo 'source "$(poetry env info -p)/bin/activate"' >> /home/${USER}/.bashrc
+
+#CMD ["/usr/local/bin/poetry", "run", "python", "chatbot/bot.py"]
+#CMD ["/usr/local/bin/poetry", "run", "python", "-m uvicorn main:app --reload"]
+CMD ["bash", "-c", "python", "-m uvicorn main:app --reload"]

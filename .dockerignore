@@ -17,4 +17,5 @@ coverage.xml
 *,cover
 *.log
 .git
-
+.idea/
+**/o/

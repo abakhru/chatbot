@@ -12,20 +12,24 @@ sklearn = "^0.0"
 google = "^2.0.2"
 colorlog = "^4.0.2"
 click = "^7.0"
-Flask = "^1.1.1"
 geoip2 = "^2.9.0"
 python-whois = "^0.7.2"
 python-dateutil = "^2.8.1"
 requests = "^2.20.0"
 docker-compose = "^1.24.1"
-networkx = "^2.4"
 pywebcopy = "^6.1.0"
 pyquery = "^1.4.1"
 w3lib = "^1.21.0"
 parse = "^1.12.1"
 psycopg2 = "^2.8.4"
 ijson = "^2.5.1"
-networkx = "^2.4"
+aiml = "^0.9.2"
+fastapi = "^0.45.0"
+uvicorn = "^0.10.8"
+pandas = "^0.25.3"
+parameterized = "^0.7.1"
+tabulate = "^0.8.6"
+docker-py = "^1.10.6"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
@@ -34,7 +38,39 @@ pytest-cov = "^2.8.1"
 pytest-instafail = "^0.4.1"
 pytest-picked = "^0.4.1"
 pytest-tldr = "^0.2.1"
+bandit = "^1.6.2"
+black = "^19.10b0"
+
+[tool.bandit]
+targets = ["chatbot"]
+skips = ["B101", "B110"]
+
+[tool.black]
+line-length = 100
+target-version = ['py38']
+skip-string_normalization = true
+include = '\.pyi?$'
+exclude = '''
+
+(
+  /(
+      \.eggs         # exclude a few common directories in the
+    | \.git          # root of the project
+    | \.hg
+    | \.mypy_cache
+    | \.tox
+    | \.venv
+    | _build
+    | buck-out
+    | build
+    | dist
+  )/
+  | foo.py           # also separately exclude a file named foo.py in
+                     # the root of the project
+)
+'''
+verbose = true
 
 [build-system]
-requires = ["poetry>=1.0"]
+requires = ["poetry>=1.0", "pip>=19.3.1", "setuptools>=45.0.0"]
 build-backend = "poetry.masonry.api"
