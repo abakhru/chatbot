@@ -19,14 +19,17 @@ class MaxmindDBManager:
         self.reader = dict()
         for _file in self.maxmind_db_files:
             if 'city' in _file.name.lower():
-                self.reader.update({'city': {'file': _file,
-                                             'reader': maxminddb.open_database(str(_file))}})
+                self.reader.update(
+                    {'city': {'file': _file, 'reader': maxminddb.open_database(str(_file))}}
+                )
             if 'country' in _file.name.lower():
-                self.reader.update({'country': {'file': _file,
-                                                'reader': maxminddb.open_database(str(_file))}})
+                self.reader.update(
+                    {'country': {'file': _file, 'reader': maxminddb.open_database(str(_file))}}
+                )
             if 'asn' in _file.name.lower():
-                self.reader.update({'asn': {'file': _file,
-                                            'reader': maxminddb.open_database(str(_file))}})
+                self.reader.update(
+                    {'asn': {'file': _file, 'reader': maxminddb.open_database(str(_file))}}
+                )
         LOGGER.debug(f'Readers dict: {self.reader}')
 
     def close(self):
@@ -35,9 +38,11 @@ class MaxmindDBManager:
 
     def download_latest(self):
         if not len(self.maxmind_db_files):
-            cmd = (f'geoipupdate '
-                   f'-f {self.app_home}/config/GeoIP.conf '
-                   f'--database-directory {self.app_home}/data -v')
+            cmd = (
+                f'geoipupdate '
+                f'-f {self.app_home}/config/GeoIP.conf '
+                f'--database-directory {self.app_home}/data -v'
+            )
             subprocess.check_output(cmd, shell=True)
             self.maxmind_db_files = list(self.app_home.joinpath('data').rglob('*.mmdb'))
 

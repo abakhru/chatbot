@@ -16,8 +16,10 @@ chat_bot = ChatBot()
 if os.path.isfile("bot_brain.brn"):
     kernel.bootstrap(brainFile="bot_brain.brn")
 else:
-    kernel.bootstrap(learnFiles=glob(f'{os.getenv("VIRTUAL_ENV")}/**/*.aiml', recursive=True),
-                     commands="load aiml b")
+    kernel.bootstrap(
+        learnFiles=glob(f'{os.getenv("VIRTUAL_ENV")}/**/*.aiml', recursive=True),
+        commands="load aiml b",
+    )
     kernel.saveBrain("bot_brain.brn")
 
 

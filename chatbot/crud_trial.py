@@ -4,8 +4,13 @@ import psycopg2
 from flask import Flask, request
 
 app = Flask(__name__)  # app initialisation
-conn = psycopg2.connect(database="crud_trials", user="crud_trials", password="crud_trials",
-                        host="127.0.0.1", port="5432")
+conn = psycopg2.connect(
+    database="crud_trials",
+    user="crud_trials",
+    password="crud_trials",
+    host="127.0.0.1",
+    port="5432",
+)
 cur = conn.cursor()
 
 

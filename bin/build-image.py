@@ -1,12 +1,10 @@
 #!/usr/bin/env python
+
 import subprocess
 from pathlib import Path
 from subprocess import PIPE
 
-import docker
-
 home = Path(__file__).parent.parent.resolve()
-client = docker.from_env()
 
 
 def build_using_cli():

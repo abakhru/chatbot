@@ -45,6 +45,11 @@ cd ~/src/chatbot && geoipupdate -f config/GeoIP.conf --database-directory ./data
 - https://towardsdatascience.com/lets-build-an-intelligent-chatbot-7ea7f215ada6?gi=da4ec7aa5db6
 - other NLTK data location: http://www.nltk.org/nltk_data/
 
+lackbox uses Python Black for formatting. Install the pre-commit hook:
+```
+brew install pre-commit
+cd ${blackbox_root}; pre-commit install
+```
 
 ### TODO
 - [x] mitre data search and co-relation
