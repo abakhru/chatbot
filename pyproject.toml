@@ -44,9 +44,11 @@ black = "^19.10b0"
 [tool.bandit]
 targets = ["chatbot"]
 skips = ["B101", "B110"]
+
 [tool.black]
 line-length = 100
-target-version = ['py37']
+target-version = ['py38']
+skip-string_normalization = true
 include = '\.pyi?$'
 exclude = '''
 
@@ -67,8 +69,8 @@ exclude = '''
                      # the root of the project
 )
 '''
+verbose = true
 
 [build-system]
 requires = ["poetry>=1.0", "pip>=19.3.1", "setuptools>=45.0.0"]
 build-backend = "poetry.masonry.api"
-
