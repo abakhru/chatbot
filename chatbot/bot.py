@@ -124,7 +124,7 @@ class ChatBot:
         return response
 
     def normalize(self, text):
-        remove_punct_dict = dict((ord(punct), None) for punct in string.punctuation)
+        remove_punct_dict = {ord(punct): None for punct in string.punctuation}
         # word tokenization
         word_token = nltk.word_tokenize(text.lower().translate(remove_punct_dict))
 
@@ -313,7 +313,7 @@ class ChatBot:
     @staticmethod
     def check_ip(_ip):
         # regex for validating an Ip-address
-        regex = '''^(25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)\.( 
+        regex = r'''^(25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)\.( 
                         25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)\.( 
                         25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)\.( 
                         25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)'''
