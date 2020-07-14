@@ -1,4 +1,9 @@
 #!/usr/bin/env python
+
+"""
+- https://github.com/goldsmith/Wikipedia
+"""
+
 import os
 import random
 import re
