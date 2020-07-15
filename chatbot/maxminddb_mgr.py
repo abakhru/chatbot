@@ -43,7 +43,6 @@ class MaxmindDBManager:
 
     def find(self, query):
         """
-
         :param query: ip=1.1.1.1
         :return:
         """
