@@ -247,23 +247,20 @@ class HttpDriver:
         params = self.__merge_default_params__(params)
         try:
             LOGGER.debug(f'[POST] Payload: {data}')
-            response = self.session.post(
-                request_url,
-                params=params,
-                data=data,
-                files=files,
-                headers=headers,
-                timeout=timeout,
-                cookies=self.session.cookies,
-            )
+            response = self.session.post(request_url,
+                                         params=params,
+                                         data=data,
+                                         files=files,
+                                         headers=headers,
+                                         timeout=timeout,
+                                         cookies=self.session.cookies)
             LOGGER.debug(f'[POST] Request URL: {response.request.url}')
             LOGGER.debug(f'[POST] Request Headers:\n{response.request.headers}')
             LOGGER.debug(f'[POST] Response Status: {response.status_code}')
             if response.content.decode() != '':
                 if self.__valid_json__(response.text):
-                    LOGGER.debug(
-                        '[POST] Response Content:\n{}'.format(self.PrettyPrintJson(response.json()))
-                    )
+                    LOGGER.debug(f'[POST] Response Content:\n'
+                                 f'{self.PrettyPrintJson(response.json())}')
                 else:
                     LOGGER.debug(f'[POST] Response Content:\n{response.text}')
             return response
@@ -291,9 +288,8 @@ class HttpDriver:
         request_url = self.base_url + url
         params = self.__merge_default_params__(params)
         try:
-            response = self.session.delete(
-                request_url, params=params, json=data, headers=headers, timeout=timeout
-            )
+            response = self.session.delete(request_url, params=params, json=data,
+                                           headers=headers, timeout=timeout)
             return response
         except HttpDriverException as e:
             raise HttpDriverException('DeleteRequestError', request_url, str(e))
@@ -321,23 +317,20 @@ class HttpDriver:
         params = self.__merge_default_params__(params)
         try:
             LOGGER.debug(f'[PUT] Payload: {data}')
-            response = self.session.put(
-                request_url,
-                params=params,
-                data=data,
-                timeout=timeout,
-                cookies=self.session.cookies,
-                headers=headers,
-                files=files,
-            )
+            response = self.session.put(request_url,
+                                        params=params,
+                                        data=data,
+                                        timeout=timeout,
+                                        cookies=self.session.cookies,
+                                        headers=headers,
+                                        files=files)
             LOGGER.debug(f'[PUT] Request URL: {response.request.url}')
             LOGGER.debug(f'[PUT] Request Headers:\n{response.request.headers}')
             LOGGER.debug(f'[PUT] Response Status: {response.status_code}')
             if response.content.decode() != '':
                 if self.__valid_json__(response.text):
-                    LOGGER.debug(
-                        '[PUT] Response Content:\n{}'.format(self.PrettyPrintJson(response.json()))
-                    )
+                    LOGGER.debug(f'[PUT] Response Content:\n'
+                                 f'{self.PrettyPrintJson(response.json())}')
                 else:
                     LOGGER.debug(f'[PUT] Response Content:\n{response.text}')
             return response

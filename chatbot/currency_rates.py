@@ -8,13 +8,12 @@ class CurrencyRates:
     def __init__(self):
         self.base_url = '/v1'
         self.user = 'jadiy75895@etopmail.com'
-        self.url_dict = {
-            'latest': f'{self.base_url}/latest',
-            'historical': f'{self.base_url}/historical',
-            'timeseries': f':{self.base_url}/timeseries',
-            'currencies': f'{self.base_url}/currencies',
-            'convert': f'{self.base_url}/convert',
-        }
+        self.url_dict = {'latest': f'{self.base_url}/latest',
+                         'historical': f'{self.base_url}/historical',
+                         'timeseries': f':{self.base_url}/timeseries',
+                         'currencies': f'{self.base_url}/currencies',
+                         'convert': f'{self.base_url}/convert',
+                         }
         self.api_key = 'e7054350fcdd8a91da79c8ffb58a4ed3'
         self.auth_param = {'api_key': self.api_key}
         self.client = HttpDriver(host='api.currencyscoop.com', port=443, protocol='https')

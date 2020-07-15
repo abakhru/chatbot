@@ -26,7 +26,7 @@ cd ~/src/chatbot && docker build -t chatbot -f chatbot/Dockerfile .
 
 #### run with docker container
 ```
-docker run -it --rm chatbot bash
+docker run -it -v $PWD:/app/ --rm chatbot bash
 ```
 
 #### geoip db update

@@ -39,8 +39,8 @@ nltk.download('averaged_perceptron_tagger', quiet=True)
 def check_ssl(func):
     def wrap(*args, **kwargs):
         if not os.environ.get("PYTHONHTTPSVERIFY", "") and getattr(
-            ssl, "_create_unverified_context", None
-        ):
+                ssl, "_create_unverified_context", None
+                ):
             ssl._create_default_https_context = ssl._create_unverified_context
         return func(*args, **kwargs)
 
@@ -71,19 +71,15 @@ class ChatBot:
     def get_hr_data():
         hr_data_path = Path('/tmp', '.HR.txt')
         if not hr_data_path.exists():
-            r = requests.get(
-                url='http://www.whatishumanresource.com/human-resource-management',
-                allow_redirects=True,
-            )
+            r = requests.get(url='http://www.whatishumanresource.com/human-resource-management',
+                             allow_redirects=True)
             hr_data_path.write_text(r.content.decode())
         return hr_data_path.read_text()
 
     def get_mitre_data(self):
         mitre_data_path = Path('/tmp', '.mitre.txt')
-        urls = [
-            'https://www.exabeam.com/information-security/what-is-mitre-attck-an-explainer/',
-            'https://github.com/mitre/cti/raw/master/enterprise-attack/enterprise-attack.json',
-        ]
+        urls = ['https://www.exabeam.com/information-security/what-is-mitre-attck-an-explainer/',
+                'https://github.com/mitre/cti/raw/master/enterprise-attack/enterprise-attack.json']
         if not mitre_data_path.exists():
             r = requests.get(urls[1])
             mitre_data_path.write_text(r.text)
@@ -136,13 +132,10 @@ class ChatBot:
         # remove ascii
         new_words = []
         for word in word_token:
-            new_word = (
-                unicodedata.normalize('NFKD', word)
-                .encode('ascii', 'ignore')
-                .decode('utf-8', 'ignore')
-            )
+            new_word = (unicodedata.normalize('NFKD', word)
+                        .encode('ascii', 'ignore')
+                        .decode('utf-8', 'ignore'))
             new_words.append(new_word)
-
         # Remove tags
         rmv = []
         for w in new_words:
@@ -251,15 +244,15 @@ class ChatBot:
             if _item.get('name') and _name in _item.get('name'):
                 if isinstance(_item.get('external_references'), list):
                     name_id_dict.append(
-                        {
-                            'name': _item['name'],
-                            'external_id': [
-                                refs['external_id']
-                                for refs in _item['external_references']
-                                if refs.get('external_id')
-                            ][0],
-                        }
-                    )
+                            {
+                                'name': _item['name'],
+                                'external_id': [
+                                    refs['external_id']
+                                    for refs in _item['external_references']
+                                    if refs.get('external_id')
+                                    ][0],
+                                }
+                            )
         return name_id_dict
 
     @staticmethod
@@ -282,11 +275,9 @@ class ChatBot:
                 response = list()
                 if topic.startswith('T'):
                     _item = self.search_t_id(topic)
-                    response = [
-                        f"**** {_item.get('name')} ****",
-                        _item.get('description'),
-                        '=' * 100,
-                    ]
+                    response = [f"**** {_item.get('name')} ****",
+                                _item.get('description'),
+                                '=' * 100]
                 else:
                     _item = self.search_names(topic)
                     response.append(f"**** Attack Types containing name '{topic}' ****")
@@ -301,10 +292,10 @@ class ChatBot:
         """geoip lookup"""
         # extract IPv4 address from the string
         reg_ex = re.search(
-            r'((?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?\.){3}'
-            r'(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)))',
-            _input,
-        )
+                r'((?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?\.){3}'
+                r'(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)))',
+                _input,
+                )
         LOGGER.debug(f'regex: {reg_ex}')
         try:
             if reg_ex:
