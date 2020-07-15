@@ -4,15 +4,10 @@
 - wikipedia search
 - google search
 
-### Install Poetry
-```.bash
-python3 -m pip install --pre poetry
-```
-
 ### install and run chatbot
 ```.env
-git clone https://github.com/abakhru/chatbot.git && cd chatbot
-poetry shell && poetry install && poetry show --tree
+git clone https://github.com/abakhru/chatbot.git
+cd chatbot && bin/quick_start.sh
 ```
 
 ### Run the bot
@@ -44,15 +39,6 @@ cd ~/src/chatbot && geoipupdate -f config/GeoIP.conf --database-directory ./data
 ### Reference:
 - https://towardsdatascience.com/lets-build-an-intelligent-chatbot-7ea7f215ada6?gi=da4ec7aa5db6
 - other NLTK data location: http://www.nltk.org/nltk_data/
-
-### Code formatting using Black. Install the pre-commit hook:
-```
-brew install pre-commit
-cd ~/src/chatbot; pre-commit install
-# black --config ./pyproject.toml .  <= only needed if you need to format whole project files
-```
-- Now do the code changes as necessary and when you perform `git commit`, black would auto
-  -format changed files and you can review and git add those files for commit
  
 ### TODO
 - [x] mitre data search and co-relation
