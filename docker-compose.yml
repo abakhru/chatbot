@@ -25,6 +25,8 @@ services:
     security_opt:
       - apparmor:unconfined
     restart: always
+    networks:
+      - chatbot
     volumes:
       - /etc/passwd:/host/etc/passwd:ro
       - /etc/group:/host/etc/group:ro
@@ -32,5 +34,34 @@ services:
       - /sys:/host/sys:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
 
+  proxy:
+    restart: always
+    image: nginx:alpine
+    ports:
+      - 80:80/tcp
+      - 443:443/tcp
+    depends_on:
+      - chatbot
+      - netdata
+    secrets:
+      -   source: proxy.ca
+          target: /etc/nginx/certs/rengine_chain.pem
+      -   source: proxy.cert
+          target: /etc/nginx/certs/rengine.pem
+      -   source: proxy.key
+          target: /etc/nginx/certs/rengine_rsa.key
+    volumes:
+      - ./config/nginx/chatbot.conf:/etc/nginx/conf.d/chatbot.conf:ro
+    networks:
+      - chatbot
+
 networks:
   chatbot:
+
+secrets:
+  proxy.ca:
+    file: ./secrets/certs/rengine_chain.pem
+  proxy.key:
+    file: ./secrets/certs/rengine_rsa.key
+  proxy.cert:
+    file: ./secrets/certs/rengine.pem
