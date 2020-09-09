@@ -12,7 +12,7 @@ python3 -m pip install --pre poetry
 ### install and run chatbot
 ```.env
 git clone https://github.com/abakhru/chatbot.git && cd chatbot
-poetry shell && poetry install && poetry show --tree
+./quickstart.sh
 ```
 
 ### Run the bot
@@ -44,17 +44,12 @@ cd ~/src/chatbot && geoipupdate -f config/GeoIP.conf --database-directory ./data
 ### Reference:
 - https://towardsdatascience.com/lets-build-an-intelligent-chatbot-7ea7f215ada6?gi=da4ec7aa5db6
 - other NLTK data location: http://www.nltk.org/nltk_data/
-
-### Code formatting using Black. Install the pre-commit hook:
-```
-brew install pre-commit
-cd ~/src/chatbot; pre-commit install
-# black --config ./pyproject.toml .  <= only needed if you need to format whole project files
-```
-- Now do the code changes as necessary and when you perform `git commit`, black would auto
-  -format changed files and you can review and git add those files for commit
  
 ### TODO
+- [ ] Voice activated AI Virtual Assistant
+    - [ ] you can use packages such as pyaudio, SpeechRecognition, gTTS, and Wikipedia. 
+    - [ ] The goal here is to record the audio, convert the audio to text, process the command
+    , and make the program act according to the command.
 - [x] mitre data search and co-relation
 - [ ] more natural conversational
 - [ ] search videos, news etc
@@ -72,4 +67,4 @@ cd ~/src/chatbot; pre-commit install
 - [x] add colored logger
 - [x] Dockerize the application
 - [x] add [netdata](https://github.com/netdata/netdata) monitoring support
-- [x] add support for pre-commit and black code auto-formatters
+- [x] add support for pre-commit code auto-formatters

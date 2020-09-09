@@ -5,7 +5,7 @@ services:
     env_file:
       - chatbot.env
     build: ./chatbot/
-    command: python3 -m poetry run python chatbot/bot.py
+    command: env/bin/python3 chatbot/bot.py
     volumes:
       - ./chatbot:/app/chatbot
     ports:

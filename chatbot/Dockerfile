@@ -3,6 +3,7 @@ LABEL maintainer="amit <bakhru@me.com>"
 
 # set environment variables
 ENV USER=botuser PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 WORKDIR=/app
+ENV VIRTUAL_ENV=${WORKDIR}/env
 
 # set work directory
 WORKDIR ${WORKDIR}
@@ -18,22 +19,16 @@ RUN apt update && \
     apt install -y --no-install-recommends curl gcc libc-dev libressl-dev libffi-dev \
     musl-dev python3-dev build-base build-deps && \
     apt clean && apt autoremove -y && rm -rf /var/lib/apt/lists/* && \
-    mkdir -p ${WORKDIR}/chatbot && rm -rf /home/${USER}/.cache/pip \
     chown -R ${USER}:${USER} ${WORKDIR}
 
-RUN python3 -m pip install -q -U pip setuptools && \
-    python3 -m pip install -q --pre poetry
+USER ${USER}
+COPY . ${WORKDIR}/chatbot/
 
 USER ${USER}
-COPY pyproject.toml ${WORKDIR}/
-COPY chatbot/* ${WORKDIR}/chatbot/
-
-USER ${USER}
-RUN python3 -m poetry install && \
+RUN python3 -m venv ${VIRTUAL_ENV} && \
     # download nltk files
-    python3 -m poetry run python -c "import nltk; nltk.download('punkt', quiet=False)" && \
-    python3 -m poetry run python -c "import nltk; nltk.download('wordnet', quiet=False)" && \
-    python3 -m poetry run python -c "import nltk; nltk.download('averaged_perceptron_tagger', quiet=False)" && \
-    echo 'source "$(poetry env info -p)/bin/activate"' >> /home/${USER}/.bashrc
+    ${VIRTUAL_ENV}/bin/python -c "import nltk; nltk.download('punkt', quiet=False)" && \
+    ${VIRTUAL_ENV}/bin/python -c "import nltk; nltk.download('wordnet', quiet=False)" && \
+    ${VIRTUAL_ENV}/bin/python -c "import nltk; nltk.download('averaged_perceptron_tagger', quiet=False)" && \
 
-CMD ["bash", "-c", "python", "-m uvicorn main:app --reload"]
+CMD ["bash", "-c", "${VIRTUAL_ENV}/bin/python", "-m uvicorn main:app --reload"]
