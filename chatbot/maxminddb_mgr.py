@@ -1,63 +1,117 @@
 #!/usr/bin/env python
 import json
+import re
 import subprocess
-from pathlib import Path
 
 import maxminddb
 
-from chatbot import LOGGER
+from chatbot import LOGGER, ROOT_DIR
 
 
 class MaxmindDBManager:
-    LICENSE_KEY = ''
+
+    LICENSE_KEY = ""
 
     def __init__(self):
-        self.app_home = Path(__file__).parent.parent
-        self.maxmind_db_files = list(self.app_home.joinpath('data').rglob('*.mmdb'))
+        self.maxmind_db_files = list(ROOT_DIR.joinpath("data").rglob("*.mmdb"))
         self.download_latest()
-        LOGGER.debug(f'maxmind files: {self.maxmind_db_files}')
         self.reader = dict()
         for _file in self.maxmind_db_files:
-            if 'city' in _file.name.lower():
+            if "city" in _file.name.lower():
                 self.reader.update(
-                    {'city': {'file': _file, 'reader': maxminddb.open_database(str(_file))}}
+                    {
+                        "city": {
+                            "file": _file,
+                            "reader": maxminddb.open_database(str(_file)),
+                        }
+                    }
                 )
-            if 'country' in _file.name.lower():
+            if "country" in _file.name.lower():
                 self.reader.update(
-                    {'country': {'file': _file, 'reader': maxminddb.open_database(str(_file))}}
+                    {
+                        "country": {
+                            "file": _file,
+                            "reader": maxminddb.open_database(str(_file)),
+                        }
+                    }
                 )
-            if 'asn' in _file.name.lower():
+            if "asn" in _file.name.lower():
                 self.reader.update(
-                    {'asn': {'file': _file, 'reader': maxminddb.open_database(str(_file))}}
+                    {
+                        "asn": {
+                            "file": _file,
+                            "reader": maxminddb.open_database(str(_file)),
+                        }
+                    }
                 )
-        LOGGER.debug(f'Readers dict: {self.reader}')
 
     def close(self):
         for _, v in self.reader.items():
-            v['reader'].close()
+            v["reader"].close()
 
     def download_latest(self):
         if not len(self.maxmind_db_files):
             cmd = (
-                f'geoipupdate '
-                f'-f {self.app_home}/config/GeoIP.conf '
-                f'--database-directory {self.app_home}/data -v'
+                f"geoipupdate "
+                f"-f {ROOT_DIR}/config/GeoIP.conf "
+                f"--database-directory {ROOT_DIR}/data -v"
             )
             subprocess.check_output(cmd, shell=True)
-            self.maxmind_db_files = list(self.app_home.joinpath('data').rglob('*.mmdb'))
+            self.maxmind_db_files = list(ROOT_DIR.joinpath("data").rglob("*.mmdb"))
+        assert len(self.maxmind_db_files) > 2
 
-    def find(self, query):
+    def maxmind_search(self, query):
         """
 
         :param query: ip=1.1.1.1
         :return:
         """
-        result = self.reader['city']['reader'].get(query)
+        result = self.reader["city"]["reader"].get(query)
         # result = self.reader['asn']['reader'].get(query)
         # result = self.reader['country']['reader'].get(query)
         return result
 
+    def geoip_lookup(self, _input):
+        """geoip lookup"""
+        # extract IPv4 address from the string
+        reg_ex = re.search(
+            r"""((?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?\.){3}(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)))""",
+            _input,
+        )
+        try:
+            if reg_ex:
+                topic = reg_ex.group(1)
+                LOGGER.debug(f"topic: {topic}")
+                return self.maxmind_search(topic)
+        except Exception as e:
+            LOGGER.error(e)
+            LOGGER.warning(f"No valid IP {reg_ex.group(1)} has been found")
 
-if __name__ == '__main__':
+    @staticmethod
+    def check_ip(_ip):
+        # regex for validating an Ip-address
+        regex = r"""^(25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)\.( 
+                        25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)\.( 
+                        25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)\.( 
+                        25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)"""
+
+        if re.search(regex, _ip):
+            return True
+        else:
+            return False
+
+    def check_if_url_domain_ip(self, request_data):
+        _response = None
+        if self.check_ip(request_data):
+            _response = f"ip_address={request_data}"
+        if request_data == "domain":
+            _response = f"domain={request_data}"
+        if request_data == "url":
+            _response = f"url={request_data}"
+        return _response.split("=")[0], _response
+
+
+if __name__ == "__main__":
     p = MaxmindDBManager()
-    LOGGER.info(json.dumps(p.find('2.2.2.2'), indent=4, sort_keys=True))
+    LOGGER.info(json.dumps(p.find("1.1.1.1"), indent=4, sort_keys=True))
+    p.close()
