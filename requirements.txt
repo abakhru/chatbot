@@ -30,3 +30,7 @@ pytest-instafail
 pytest-picked
 pytest-tldr
 bandit
+SpeechRecognition
+pocketsphinx
+google-api-python-client
+oauth2client

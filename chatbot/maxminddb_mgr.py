@@ -5,15 +5,14 @@ import subprocess
 
 import maxminddb
 
-from chatbot import LOGGER, ROOT_DIR
+from chatbot import DATA_DIR, LOGGER, ROOT_DIR
 
 
 class MaxmindDBManager:
-
     LICENSE_KEY = ""
 
     def __init__(self):
-        self.maxmind_db_files = list(ROOT_DIR.joinpath("data").rglob("*.mmdb"))
+        self.maxmind_db_files = list(DATA_DIR.joinpath("data").rglob("*.mmdb"))
         self.download_latest()
         self.reader = dict()
         for _file in self.maxmind_db_files:
@@ -54,10 +53,10 @@ class MaxmindDBManager:
             cmd = (
                 f"geoipupdate "
                 f"-f {ROOT_DIR}/config/GeoIP.conf "
-                f"--database-directory {ROOT_DIR}/data -v"
+                f"--database-directory {DATA_DIR} -v"
             )
             subprocess.check_output(cmd, shell=True)
-            self.maxmind_db_files = list(ROOT_DIR.joinpath("data").rglob("*.mmdb"))
+            self.maxmind_db_files = list(DATA_DIR.rglob("*.mmdb"))
         assert len(self.maxmind_db_files) > 2
 
     def maxmind_search(self, query):

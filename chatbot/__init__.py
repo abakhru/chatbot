@@ -1,9 +1,13 @@
 import logging
+import warnings
 from pathlib import Path
 
+import nltk
 from colorlog import ColoredFormatter
 
+warnings.filterwarnings("ignore")
 ROOT_DIR = Path(__file__).parent.parent.resolve()
+DATA_DIR = ROOT_DIR.joinpath("data")
 WHOIS_API_KEY = "73ioc7xawi00DK2G4qpOEcml8TegKDuI"
 LOGGER = logging.getLogger(__name__)
 FORMAT = "%(log_color)s%(message)s%(reset)s"
@@ -150,3 +154,7 @@ WELCOME_DICT = {
         "I am glad! You are talking to me",
     ],
 }
+
+nltk.download("punkt", quiet=True)
+nltk.download("wordnet", quiet=True)
+nltk.download("averaged_perceptron_tagger", quiet=True)

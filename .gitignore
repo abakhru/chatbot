@@ -129,3 +129,5 @@ dmypy.json
 data/
 *.brn
 poetry.lock
+.mp3
+.wav

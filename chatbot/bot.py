@@ -5,9 +5,7 @@ import re
 import ssl
 import string
 import unicodedata
-import warnings
 from collections import defaultdict
-from pathlib import Path
 from urllib.request import urlopen
 
 import nltk
@@ -21,20 +19,19 @@ from nltk.stem.wordnet import WordNetLemmatizer
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import linear_kernel
 
-from chatbot import LOGGER, WELCOME_DICT
+from chatbot import DATA_DIR, LOGGER, WELCOME_DICT
+from chatbot.audio_manager import AudioManager
 from chatbot.maxminddb_mgr import MaxmindDBManager
 from chatbot.query_mitre import QueryMitre
-
-warnings.filterwarnings("ignore")
-nltk.download("punkt", quiet=True)
-nltk.download("wordnet", quiet=True)
-nltk.download("averaged_perceptron_tagger", quiet=True)
 
 
 def check_ssl(func):
     def wrap(*args, **kwargs):
-        if not os.environ.get("PYTHONHTTPSVERIFY", "") and getattr(
-            ssl, "_create_unverified_context", None
+        if all(
+            [
+                not os.environ.get("PYTHONHTTPSVERIFY", ""),
+                getattr(ssl, "_create_unverified_context", None),
+            ]
         ):
             ssl._create_default_https_context = ssl._create_unverified_context
         return func(*args, **kwargs)
@@ -42,7 +39,7 @@ def check_ssl(func):
     return wrap
 
 
-class ChatBot(QueryMitre, MaxmindDBManager):
+class ChatBot(QueryMitre, MaxmindDBManager, AudioManager):
     def __init__(self):
         self.welcome_input = WELCOME_DICT["input"]
         self.welcome_response = WELCOME_DICT["response"]
@@ -50,9 +47,10 @@ class ChatBot(QueryMitre, MaxmindDBManager):
         self.hr_data = self.get_hr_data()
         self.sent_tokens = nltk.sent_tokenize(self.hr_data.lower())
         # self.sent_tokens = nltk.sent_tokenize(self.mitre_data.lower())
-        # self.start()
         super().__init__()
         MaxmindDBManager()
+        AudioManager()
+        self.start()
 
     def iesha_chat(self):
         print("Iesha the TeenBoT\n---------")
@@ -64,7 +62,7 @@ class ChatBot(QueryMitre, MaxmindDBManager):
 
     @staticmethod
     def get_hr_data():
-        hr_data_path = Path("/tmp", ".HR.txt")
+        hr_data_path = DATA_DIR.joinpath("HR.txt")
         if not hr_data_path.exists():
             r = requests.get(
                 url="http://www.whatishumanresource.com/human-resource-management",
@@ -76,34 +74,34 @@ class ChatBot(QueryMitre, MaxmindDBManager):
     def start(self):
         flag = True
         LOGGER.info(
-            "My name is Chatterbot and I'm a chatbot. If you want to exit, type Bye!"
+            "[AI] > My name is Chatterbot and I'm a chat bot. "
+            "If you want to exit, type Bye!"
         )
         while flag:
-            user_response = input()
+            user_response = input("[You] > ")
             user_response = user_response.lower()
             if user_response not in ["bye", "shutdown", "exit", "quit"]:
-                if user_response == "thanks" or user_response == "thank you":
+                if user_response in ["thanks", "thank you"]:
                     flag = False
-                    LOGGER.info("Chatterbot : You are welcome..")
+                    LOGGER.info("[AI] > You are welcome..")
                 else:
                     if self.welcome(user_response) is not None:
-                        LOGGER.info(f"Chatterbot : {self.welcome(user_response)}")
+                        LOGGER.info(f"[AI] > {self.welcome(user_response)}")
                     else:
-                        LOGGER.warning(f"{self.generate_response(user_response)}")
+                        bot_response = self.generate_response(user_response)
+                        LOGGER.warning(bot_response)
+                        t = self.text_to_speech(bot_response)
+                        self.play_wav(t)
                         self.sent_tokens.remove(user_response)
             else:
                 flag = False
-                self.close()
-                LOGGER.info("Chatterbot : Bye!!! ")
-
-    def close(self):
-        self.maxmind_reader.close()
+                LOGGER.info("[AI] > Bye!!! ")
 
     def respond(self, input_):
         user_response = input_.lower()
         if user_response not in ["bye", "shutdown", "exit", "quit"]:
             if user_response == "thanks" or user_response == "thank you":
-                response = "Chatterbot : You are welcome.."
+                response = "[AI] > You are welcome.."
             else:
                 if self.welcome(user_response) is not None:
                     response = self.welcome(user_response)
@@ -111,7 +109,7 @@ class ChatBot(QueryMitre, MaxmindDBManager):
                     response = self.generate_response(user_response)
                     self.sent_tokens.remove(user_response)
         else:
-            response = "Chatterbot : Bye!!! "
+            response = "[AI] > Bye!!! "
         return response
 
     def normalize(self, text):
@@ -130,7 +128,7 @@ class ChatBot(QueryMitre, MaxmindDBManager):
             new_words.append(new_word)
 
         # Remove tags
-        rmv = []
+        rmv = list()
         for w in new_words:
             text = re.sub("&lt;/?.*?&gt;", "&lt;&gt;", w)
             rmv.append(text)
@@ -163,34 +161,33 @@ class ChatBot(QueryMitre, MaxmindDBManager):
         idx = vals.argsort()[0][-2]
         flat = vals.flatten()
         flat.sort()
-        req_tfidf = flat[-2]
+        # req_tfidf = flat[-2]
         req_tfidf = 1
         if (req_tfidf == 0) or "mitre" in user_response:
-            LOGGER.info("Chatterbot : Checking Mitre")
+            LOGGER.info("[AI] > Checking Mitre")
             if user_response:
                 robo_response = self.search_mitre_data(user_response)
                 return robo_response
         if (req_tfidf == 0) or "wiki" in user_response:
-            LOGGER.info("Chatterbot : Checking Wikipedia")
+            LOGGER.info("[AI] > Checking Wikipedia")
             if user_response:
                 robo_response = self.wikipedia_data(user_response)
                 return robo_response
         if (
-            (req_tfidf == 0)
-            or "google" in user_response
+            any([req_tfidf == 0, "google" in user_response])
             and "google.com" not in user_response
         ):
-            LOGGER.info("Chatterbot : Checking Google")
+            LOGGER.info("[AI] > Checking Google")
             if user_response:
                 robo_response = self.google_data(user_response)
                 return robo_response
         if (req_tfidf == 0) or "geoip" in user_response:
-            LOGGER.info("Chatterbot : Checking GeoIP LookUP")
+            LOGGER.info("[AI] > Checking GeoIP LookUP")
             if user_response:
                 robo_response = self.geoip_lookup(user_response)
                 return robo_response
         if (req_tfidf == 0) or "whois" in user_response:
-            LOGGER.info("Chatterbot : Checking Whois LookUP")
+            LOGGER.info("[AI] > Checking Whois LookUP")
             if user_response:
                 robo_response = self.whois_lookup(user_response)
                 return robo_response
@@ -198,8 +195,9 @@ class ChatBot(QueryMitre, MaxmindDBManager):
             robo_response = robo_response + self.sent_tokens[idx]
             return robo_response
 
-    # wikipedia search
-    def wikipedia_data(self, _input):
+    @staticmethod
+    def wikipedia_data(_input):
+        """ wikipedia search"""
         reg_ex = re.search("wiki (.*)", _input)
         try:
             if reg_ex:
@@ -250,5 +248,4 @@ class ChatBot(QueryMitre, MaxmindDBManager):
 
 if __name__ == "__main__":
     p = ChatBot()
-    p.start()
     # p.iesha_chat()
