@@ -10,7 +10,7 @@ git clone https://github.com/abakhru/chatbot.git && cd chatbot
 brew install portaudio swig # on mac only
 brew install openal-soft
 (cd /usr/local/include && ln -s /usr/local/Cellar/openal-soft/1.20.1/include/AL/* .)
-./quickstart.sh
+bin/quickstart.sh
 ```
 
 ### Run the bot
