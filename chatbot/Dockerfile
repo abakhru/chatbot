@@ -32,11 +32,13 @@ RUN apt update && \
     swig \
     git \
     libpulse-dev \
+    portaudio19-dev \
     libasound2-dev \
     python3-all-dev && \
+    apt install -y sudo --option=Dpkg::Options::=--force-confdef && \
     apt clean && apt autoremove -y && rm -rf /var/lib/apt/lists/*
 
 USER ${USER}
-RUN ./quick_start.sh
+RUN bin/quick_start.sh
 
 CMD ["bash", "-c", "${VIRTUAL_ENV}/bin/python", "-m uvicorn main:app --reload"]

@@ -30,7 +30,9 @@ pytest-instafail
 pytest-picked
 pytest-tldr
 bandit
+pyaudio
 SpeechRecognition
 pocketsphinx
 google-api-python-client
 oauth2client
+gTTS
