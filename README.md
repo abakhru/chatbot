@@ -4,14 +4,12 @@
 - wikipedia search
 - google search
 
-### Install Poetry
-```.bash
-python3 -m pip install --pre poetry
-```
-
 ### install and run chatbot
 ```.env
 git clone https://github.com/abakhru/chatbot.git && cd chatbot
+brew install portaudio swig # on mac only
+brew install openal-soft
+(cd /usr/local/include && ln -s /usr/local/Cellar/openal-soft/1.20.1/include/AL/* .)
 ./quickstart.sh
 ```
 
@@ -47,9 +45,11 @@ cd ~/src/chatbot && geoipupdate -f config/GeoIP.conf --database-directory ./data
  
 ### TODO
 - [ ] Voice activated AI Virtual Assistant
-    - [ ] you can use packages such as pyaudio, SpeechRecognition, gTTS, and Wikipedia. 
-    - [ ] The goal here is to record the audio, convert the audio to text, process the command
-    , and make the program act according to the command.
+    - [x] use [pyaudio](https://people.csail.mit.edu/hubert/pyaudio/) to record and play audio
+    - [x] use [SpeechRecognition](https://github.com/Uberi/speech_recognition) to convert audio to text
+    - [x] use [gTTS](https://github.com/pndurette/gTTS) to convert text to speech 
+    - [ ] The goal here is to record the audio, convert the audio to text, process the command, and make the program act according to the command.
+- [ ] Add help options with available commands
 - [x] mitre data search and co-relation
 - [ ] more natural conversational
 - [ ] search videos, news etc
@@ -63,7 +63,7 @@ cd ~/src/chatbot && geoipupdate -f config/GeoIP.conf --database-directory ./data
   - [x] whois lookup
 - [ ] add more topic related source urls
 - [ ] package the application using [`PyOxidizer`](https://github.com/indygreg/PyOxidizer)
-- [x] add tests
+- [x] add basic tests
 - [x] add colored logger
 - [x] Dockerize the application
 - [x] add [netdata](https://github.com/netdata/netdata) monitoring support

@@ -5,13 +5,13 @@ import re
 import ijson
 import requests
 
-from chatbot import LOGGER, ROOT_DIR
+from chatbot import DATA_DIR, LOGGER
 
 
 class QueryMitre:
     def __init__(self):
         self.mitre_data = None
-        self.mitre_data_file_path = ROOT_DIR.joinpath("data", "mitre.txt")
+        self.mitre_data_file_path = DATA_DIR.joinpath("mitre.txt")
         self.get_mitre_data()
 
     @staticmethod
