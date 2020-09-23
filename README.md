@@ -44,6 +44,7 @@ cd ~/src/chatbot && geoipupdate -f config/GeoIP.conf --database-directory ./data
 - other NLTK data location: http://www.nltk.org/nltk_data/
  
 ### TODO
+- [ ] https://github.com/alirezamika/autoscraper
 - [ ] Voice activated AI Virtual Assistant
     - [x] use [pyaudio](https://people.csail.mit.edu/hubert/pyaudio/) to record and play audio
     - [x] use [SpeechRecognition](https://github.com/Uberi/speech_recognition) to convert audio to text

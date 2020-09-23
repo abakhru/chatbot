@@ -7,7 +7,7 @@ from pathlib import Path
 import aiml
 from fastapi import FastAPI
 
-from chatbot.bot import ChatBot
+from src.bot import ChatBot
 
 app = FastAPI(__name__)
 kernel = aiml.Kernel()

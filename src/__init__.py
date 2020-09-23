@@ -45,10 +45,7 @@ reflections = {
 pairs = (
     (
         r"I\'m (.*)",
-        (
-            "ur%1?? that's so cool! kekekekeke ^_^ tell me more!",
-            "ur%1? neat!! kekeke >_<",
-        ),
+        ("ur%1?? that's so cool! kekekekeke ^_^ tell me more!", "ur%1? neat!! kekeke >_<"),
     ),
     (
         r"(.*) don\'t you (.*)",
@@ -59,10 +56,7 @@ pairs = (
         ),
     ),
     (r"ye[as] [iI] (.*)", ("u%1? cool!! how?", "how come u%1??", "u%1? so do i!!")),
-    (
-        r"do (you|u) (.*)\??",
-        ("do i%2? only on tuesdays! kekeke *_*", "i dunno! do u%2??"),
-    ),
+    (r"do (you|u) (.*)\??", ("do i%2? only on tuesdays! kekeke *_*", "i dunno! do u%2??")),
     (
         r"(.*)\?",
         (
@@ -71,10 +65,7 @@ pairs = (
             "boooooring!! ur not very fun",
         ),
     ),
-    (
-        r"(cos|because) (.*)",
-        ("hee! i don't believe u! >_<", "nuh-uh! >_<", "ooooh i agree!"),
-    ),
+    (r"(cos|because) (.*)", ("hee! i don't believe u! >_<", "nuh-uh! >_<", "ooooh i agree!")),
     (
         r"why can\'t [iI] (.*)",
         (
@@ -117,10 +108,7 @@ pairs = (
         r"(are|r) (you|u) (.*)",
         ("am i%1??! how come u ask that!", "maybe!  y shud i tell u?? kekeke >_>"),
     ),
-    (
-        r"what (.*)",
-        ("hee u think im gonna tell u? .v.", "booooooooring! ask me somethin else!"),
-    ),
+    (r"what (.*)", ("hee u think im gonna tell u? .v.", "booooooooring! ask me somethin else!")),
     (r"how (.*)", ("not tellin!! kekekekekeke ^_^",)),
     (r"(hi|hello|hey) (.*)", ("hi!!! how r u!!",)),
     (
@@ -145,14 +133,7 @@ pairs = (
 
 WELCOME_DICT = {
     "input": ["hello", "hi", "greetings", "sup", "what's up", "hey"],
-    "response": [
-        "hi",
-        "hey",
-        "*nods*",
-        "hi there",
-        "hello",
-        "I am glad! You are talking to me",
-    ],
+    "response": ["hi", "hey", "*nods*", "hi there", "hello", "I am glad! You are talking to me"],
 }
 
 nltk.download("punkt", quiet=True)

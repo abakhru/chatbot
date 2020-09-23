@@ -5,7 +5,7 @@ import subprocess
 
 import maxminddb
 
-from chatbot import DATA_DIR, LOGGER, ROOT_DIR
+from src import DATA_DIR, LOGGER, ROOT_DIR
 
 
 class MaxmindDBManager:
@@ -18,30 +18,15 @@ class MaxmindDBManager:
         for _file in self.maxmind_db_files:
             if "city" in _file.name.lower():
                 self.reader.update(
-                    {
-                        "city": {
-                            "file": _file,
-                            "reader": maxminddb.open_database(str(_file)),
-                        }
-                    }
+                    {"city": {"file": _file, "reader": maxminddb.open_database(str(_file))}}
                 )
             if "country" in _file.name.lower():
                 self.reader.update(
-                    {
-                        "country": {
-                            "file": _file,
-                            "reader": maxminddb.open_database(str(_file)),
-                        }
-                    }
+                    {"country": {"file": _file, "reader": maxminddb.open_database(str(_file))}}
                 )
             if "asn" in _file.name.lower():
                 self.reader.update(
-                    {
-                        "asn": {
-                            "file": _file,
-                            "reader": maxminddb.open_database(str(_file)),
-                        }
-                    }
+                    {"asn": {"file": _file, "reader": maxminddb.open_database(str(_file))}}
                 )
 
     def close(self):

@@ -19,10 +19,10 @@ from nltk.stem.wordnet import WordNetLemmatizer
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import linear_kernel
 
-from chatbot import DATA_DIR, LOGGER, WELCOME_DICT
-from chatbot.audio_manager import AudioManager
-from chatbot.maxminddb_mgr import MaxmindDBManager
-from chatbot.query_mitre import QueryMitre
+from src import DATA_DIR, LOGGER, WELCOME_DICT
+from src.audio_manager import AudioManager
+from src.maxminddb_mgr import MaxmindDBManager
+from src.query_mitre import QueryMitre
 
 
 def check_ssl(func):
@@ -74,8 +74,7 @@ class ChatBot(QueryMitre, MaxmindDBManager, AudioManager):
     def start(self):
         flag = True
         LOGGER.info(
-            "[AI] > My name is Chatterbot and I'm a chat bot. "
-            "If you want to exit, type Bye!"
+            "[AI] > My name is Chatterbot and I'm a chat bot. " "If you want to exit, type Bye!"
         )
         while flag:
             user_response = input("[You] > ")
@@ -173,10 +172,7 @@ class ChatBot(QueryMitre, MaxmindDBManager, AudioManager):
             if user_response:
                 robo_response = self.wikipedia_data(user_response)
                 return robo_response
-        if (
-            any([req_tfidf == 0, "google" in user_response])
-            and "google.com" not in user_response
-        ):
+        if any([req_tfidf == 0, "google" in user_response]) and "google.com" not in user_response:
             LOGGER.info("[AI] > Checking Google")
             if user_response:
                 robo_response = self.google_data(user_response)

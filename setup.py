@@ -25,7 +25,7 @@ setup(
     include_package_data=True,
     keywords="chatbot",
     name="chatbot",
-    packages=find_packages(include=["chatbot", "chatbot.*"]),
+    packages=find_packages(include=["src", "chatbot.*"]),
     test_suite="tests",
     url="https://github.com/abakhru/chatbot",
     version="0.1.0",
