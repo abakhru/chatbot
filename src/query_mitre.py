@@ -5,7 +5,7 @@ import re
 import ijson
 import requests
 
-from chatbot import DATA_DIR, LOGGER
+from src import DATA_DIR, LOGGER
 
 
 class QueryMitre:
@@ -34,10 +34,7 @@ class QueryMitre:
         for _item in self.mitre_data:
             if _item.get("name"):
                 if all(
-                    [
-                        _name in _item.get("name"),
-                        isinstance(_item.get("external_references"), list),
-                    ]
+                    [_name in _item.get("name"), isinstance(_item.get("external_references"), list)]
                 ):
                     try:
                         topic = _item["external_references"][0]["external_id"]
@@ -67,9 +64,7 @@ class QueryMitre:
             assert r.status_code == 200
             self.mitre_data_file_path.write_text(r.text)
         if not self.mitre_data:
-            self.mitre_data = ijson.items(
-                self.mitre_data_file_path.open(), "objects.item"
-            )
+            self.mitre_data = ijson.items(self.mitre_data_file_path.open(), "objects.item")
 
     def search_mitre_data(self, _input):
         """mitre search"""
@@ -91,6 +86,4 @@ class QueryMitre:
 if __name__ == "__main__":
     p = QueryMitre()
     # LOGGER.info(json.dumps(p.search_t_id('T1134'), indent=4, sort_keys=True))
-    LOGGER.info(
-        json.dumps(p.search_mitre_data("mitre Manipulation"), indent=4, sort_keys=True)
-    )
+    LOGGER.info(json.dumps(p.search_mitre_data("mitre Manipulation"), indent=4, sort_keys=True))

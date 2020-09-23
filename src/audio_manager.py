@@ -9,16 +9,14 @@ import pyaudio
 import speech_recognition as sr
 from gtts import gTTS
 
-from chatbot import DATA_DIR, LOGGER
+from src import DATA_DIR, LOGGER
 
 CHUNK = 1024
 FORMAT = pyaudio.paInt16
 CHANNELS = 2
 RATE = 44100
 RECORD_SECONDS = 5
-GOOGLE_CLOUD_SPEECH_CREDENTIALS = Path(
-    os.getenv("GOOGLE_CLOUD_SPEECH_CREDENTIALS")
-).read_text()
+GOOGLE_CLOUD_SPEECH_CREDENTIALS = Path(os.getenv("GOOGLE_CLOUD_SPEECH_CREDENTIALS")).read_text()
 
 
 class AudioManager:
@@ -49,11 +47,7 @@ class AudioManager:
 
     def record2(self, output_file="output.wav"):
         self.stream = self.p.open(
-            format=FORMAT,
-            channels=CHANNELS,
-            rate=RATE,
-            input=True,
-            frames_per_buffer=CHUNK,
+            format=FORMAT, channels=CHANNELS, rate=RATE, input=True, frames_per_buffer=CHUNK
         )
         LOGGER.info("* recording")
         frames = []
@@ -112,9 +106,7 @@ class AudioManager:
         except sr.UnknownValueError:
             LOGGER.error("Google Cloud Speech could not understand audio")
         except sr.RequestError as e:
-            LOGGER.error(
-                f"Could not request results from Google Cloud Speech service; {e}"
-            )
+            LOGGER.error(f"Could not request results from Google Cloud Speech service; {e}")
 
     @staticmethod
     def text_to_speech(text):

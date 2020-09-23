@@ -3,8 +3,8 @@ from unittest import TestCase
 from parameterized import parameterized
 from tabulate import tabulate
 
-from chatbot import LOGGER
-from chatbot.bot import ChatBot
+from src import LOGGER
+from src.bot import ChatBot
 
 
 class TestChatBot(TestCase):
