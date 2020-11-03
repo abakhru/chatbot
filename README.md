@@ -69,3 +69,4 @@ cd ~/src/chatbot && geoipupdate -f config/GeoIP.conf --database-directory ./data
 - [x] Dockerize the application
 - [x] add [netdata](https://github.com/netdata/netdata) monitoring support
 - [x] add support for pre-commit code auto-formatters
+- [ ] https://towardsdatascience.com/how-to-build-your-own-chatbot-using-deep-learning-bb41f970e281
