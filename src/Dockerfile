@@ -3,7 +3,8 @@ LABEL maintainer="amit <bakhru@me.com>"
 
 # set environment variables
 ENV USER=botuser PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 WORKDIR=/app
-ENV VIRTUAL_ENV=${WORKDIR}/env HOME=/home/${USER} DEBIAN_FRONTEND=noninteractive
+ENV HOME=/home/${USER} DEBIAN_FRONTEND=noninteractive
+ENV VIRTUAL_ENV=${HOME}/env
 ARG UID=1000
 
 # set work directory
@@ -15,7 +16,8 @@ RUN useradd -m -d /home/${USER} -s /bin/bash ${USER} && \
     echo "${USER}:${USER}" | chpasswd && adduser ${USER} sudo && \
     chown -R "${USER}:${USER}" "${HOME}" && \
     echo "${USER} ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers && \
-    chown -R ${USER}:${USER} ${WORKDIR}
+    chown -R ${USER}:${USER} ${WORKDIR} && \
+    echo "alias l='ls -larth'" >> ${HOME}/.bashrc
 
 RUN apt update && \
     apt full-upgrade -y && \

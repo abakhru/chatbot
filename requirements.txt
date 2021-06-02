@@ -36,3 +36,4 @@ pocketsphinx
 google-api-python-client
 oauth2client
 gTTS
+newspaper3k

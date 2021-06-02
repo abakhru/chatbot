@@ -1,36 +1,30 @@
-version: '3'
+version: '3.7'
 
 services:
   chatbot:
     env_file:
       - chatbot.env
-    build: src/
-    command: env/bin/python3 chatbot/bot.py
+    image: chatbot:latest
+#    command: 'bash -c "sleep 100000"'
+    command: 'bash -c "/home/botuser/env/bin/python src/audio_manager.py"'
+    # TODO: only for debugging, delete when in production
     volumes:
-      - ./chatbot:/app/chatbot
+      - ./src:/app
+#    build:
+#      src
     ports:
       - "5000:5000"
+    depends_on:
+      - tts
     networks:
       - chatbot
 
-  netdata:
-    image: netdata/netdata
+  tts:
+    image: synesthesiam/mozillatts
     ports:
-      - 19999:19999
-    environment:
-      - DOCKER_HOST=proxy:2376
-      - DO_NOT_TRACK=1
-    cap_add:
-      - SYS_PTRACE
-    security_opt:
-      - apparmor:unconfined
-    restart: always
-    volumes:
-      - /etc/passwd:/host/etc/passwd:ro
-      - /etc/group:/host/etc/group:ro
-      - /proc:/host/proc:ro
-      - /sys:/host/sys:ro
-      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - "5002:5002"
+    networks:
+      - chatbot
 
 networks:
   chatbot:

@@ -1,12 +1,19 @@
 #!/usr/bin/env python
 import os
 import subprocess
+import urllib
 import uuid
 import wave
 from pathlib import Path
+from urllib.parse import urlencode
+from urllib.request import pathname2url
 
+import newspaper
 import pyaudio
+import requests
 import speech_recognition as sr
+import urllib3
+from bs4 import BeautifulSoup
 from gtts import gTTS
 
 from src import DATA_DIR, LOGGER
@@ -46,6 +53,7 @@ class AudioManager:
         self.close()
 
     def record2(self, output_file="output.wav"):
+        """real-time recording of voice and saving to wav format"""
         self.stream = self.p.open(
             format=FORMAT, channels=CHANNELS, rate=RATE, input=True, frames_per_buffer=CHUNK
         )
@@ -64,12 +72,12 @@ class AudioManager:
         self.close()
 
     def record(self, output_file="output.wav"):
+        """real-time recording of voice from mac microphone and saving to wav format"""
         with sr.Microphone() as source:
             LOGGER.info("Say something!")
             audio = self.sr.listen(source, phrase_time_limit=RECORD_SECONDS)
         LOGGER.debug("Writing audio to a WAV file")
-        with open(output_file, "wb") as f:
-            f.write(audio.get_wav_data())
+        Path(output_file).write_bytes(audio.get_wav_data())
         LOGGER.info("Done recording !")
 
     def speech_to_text_sphinx(self, audio_file):
@@ -109,10 +117,20 @@ class AudioManager:
             LOGGER.error(f"Could not request results from Google Cloud Speech service; {e}")
 
     @staticmethod
-    def text_to_speech(text):
+    def text_to_speech_google(text):
         temp_file = DATA_DIR.joinpath(f"temp_file_{uuid.uuid4()}.mp3")
-        tts = gTTS(text)
+        tts = gTTS(text=text, lang='en', slow=False)
         tts.save(temp_file.name)
+        return temp_file.name
+
+    @staticmethod
+    def text_to_speech_mozilla(text):
+        temp_file = DATA_DIR.joinpath(f"temp_file_{uuid.uuid4()}.mp3")
+        for part_text in text.split('.'):
+            speech = requests.get('http://tts:5002/api/tts', params=f'text={part_text}')
+            assert speech.status_code == 200
+            assert speech.headers.get('Content-Type') == 'audio/wav'
+            temp_file.write_bytes(speech.content)
         return temp_file.name
 
     @staticmethod
@@ -125,12 +143,31 @@ class AudioManager:
         self.p.terminate()
 
 
+class ArticleToSpeech:
+    def __init__(self, url):
+        self.url = url
+        self.article = None
+
+    def get_article(self):
+        LOGGER.info(f'Retrieving the article from "{self.url}"')
+        self.article = newspaper.Article(self.url)
+        self.article.download()
+        self.article.parse()
+        return self.article.text
+
+    def summarize(self):
+        LOGGER.info(f'Summarizing the article ...')
+        self.article.nlp()
+        summary = self.article.summary
+        LOGGER.info({summary})
+        return summary
+
+
 if __name__ == "__main__":
     p = AudioManager()
-    ad_file = str(DATA_DIR / "temp_file_27ee87e7-40c7-4f3a-931b-c6e715b79d6e.mp3")
-    # p.play_wav('/Users/amit/Downloads/morse.wav')
-    # p.record(output_file=ad_file)
-    # Path('output.wav').write_bytes(temp_file.read())
-    # p = AudioManager()
+    news_article = 'https://openthemagazine.com/features/modi-at-70-a-style-statement/'
+    c = ArticleToSpeech(news_article)
+    article_body = c.get_article()
+    ad_file = p.text_to_speech_mozilla(article_body)
     p.play_wav(audio_file=ad_file)
     # p.speech_to_text_google(audio_file=ad_file)

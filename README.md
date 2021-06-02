@@ -24,12 +24,12 @@ bin/quickstart.sh
 
 ### build docker images
 ```
-cd ~/src/chatbot && docker build -t chatbot -f chatbot/Dockerfile .
+cd ~/src/chatbot && docker build -t chatbot -f src/Dockerfile .
 ```
 
 #### run with docker container
 ```
-docker run -it --rm chatbot bash
+docker run -it --rm -exec chatbot bash
 ```
 
 #### geoip db update
